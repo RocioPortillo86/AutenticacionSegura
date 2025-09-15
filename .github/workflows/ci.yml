@@ -8,9 +8,12 @@ on:
 jobs:
   run-notebook:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     env:
+      # 🔐 Se lee de Settings → Secrets → Actions
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      # 📂 Rutas usadas por tu notebook
       DATA_DIR: data
       PERSIST_DIR: chroma_db
       MODEL_EMB: text-embedding-ada-002
@@ -32,16 +35,33 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: ${{ runner.os }}-pip-
 
+      # (Opcional) Fijar alguna lib conflictiva; agrega líneas si lo necesitas
+      - name: Create constraints (optional)
+        run: |
+          echo "requests==2.32.3" > /tmp/constraints.txt
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -c /tmp/constraints.txt -r requirements.txt
           pip install jupyter nbconvert
 
+      - name: Debug - list files
+        run: |
+          echo "PWD:" && pwd
+          echo "--- repo files ---" && ls -la
+          echo "--- data/ files ---" && ls -la data || true
+
+      # Ejecuta el notebook y genera result.ipynb
       - name: Run Jupyter Notebook
         run: |
-          jupyter nbconvert --to notebook --execute RETO_RAG.ipynb --output result.ipynb
+          jupyter nbconvert \
+            --to notebook \
+            --execute RETO_RAG.ipynb \
+            --output result.ipynb \
+            --ExecutePreprocessor.timeout=1200
 
+      # Sube salidas como artefactos para revisarlas
       - name: Save outputs (artifact)
         if: always()
         uses: actions/upload-artifact@v4
