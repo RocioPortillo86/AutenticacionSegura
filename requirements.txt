@@ -1,6 +1,11 @@
+openai
+langchain
 langchain-community
 langchain-openai
 langchain-chroma
 chromadb
-pypdf
 tiktoken
+pypdf
+python-dotenv
+jupyter
+nbconvert
