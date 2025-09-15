@@ -40,7 +40,7 @@ jobs:
 
       - name: Run Jupyter Notebook
         run: |
-          jupyter nbconvert --to notebook --execute "RETO_RAG (2).ipynb" --output result.ipynb
+          jupyter nbconvert --to notebook --execute RETO_RAG.ipynb --output result.ipynb
 
       - name: Save outputs (artifact)
         if: always()
