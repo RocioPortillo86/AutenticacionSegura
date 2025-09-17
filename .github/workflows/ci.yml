@@ -5,23 +5,29 @@ on:
     branches: [ main ]
   pull_request:
 
+# 👇 Esto da permiso al workflow de hacer git push con GITHUB_TOKEN
+permissions:
+  contents: write
+
 jobs:
   run-notebook:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     env:
-      # 🔐 Se lee de Settings → Secrets → Actions
+      # 🔐 Llave de OpenAI (configúrala en Settings → Secrets → Actions)
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      # 📂 Rutas usadas por tu notebook
       DATA_DIR: data
       PERSIST_DIR: chroma_db
       MODEL_EMB: text-embedding-ada-002
       LLM_MODEL: gpt-4o-mini
 
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -35,15 +41,10 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: ${{ runner.os }}-pip-
 
-      # (Opcional) Fijar alguna lib conflictiva; agrega líneas si lo necesitas
-      - name: Create constraints (optional)
-        run: |
-          echo "requests==2.32.3" > /tmp/constraints.txt
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -c /tmp/constraints.txt -r requirements.txt
+          pip install -r requirements.txt
           pip install jupyter nbconvert
 
       - name: Debug - list files
@@ -52,7 +53,7 @@ jobs:
           echo "--- repo files ---" && ls -la
           echo "--- data/ files ---" && ls -la data || true
 
-      # Ejecuta el notebook y genera result.ipynb
+      # 👉 Aquí ejecutas tu notebook, que genera resultados en la carpeta results/
       - name: Run Jupyter Notebook
         run: |
           jupyter nbconvert \
@@ -61,7 +62,16 @@ jobs:
             --output result.ipynb \
             --ExecutePreprocessor.timeout=1200
 
-      # Sube salidas como artefactos para revisarlas
+      # 👇 Paso que hace commit y push de los resultados
+      - name: Commit results (if any)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/* || true
+          git commit -m "Add QA results $(date -u +%Y%m%d_%H%M)" || echo "No changes to commit"
+          git push
+
+      # Sube también los resultados como artefactos (opcional, para descargarlos de Actions)
       - name: Save outputs (artifact)
         if: always()
         uses: actions/upload-artifact@v4
@@ -69,5 +79,7 @@ jobs:
           name: outputs
           path: |
             result.ipynb
-            chroma_db
+            results/
           if-no-files-found: warn
+
+
