@@ -10,9 +10,8 @@ Para configurar un entorno de desarrollo para un proyecto de Punto de Venta en V
    - Descarga e instala Visual Studio 2022 desde el [sitio oficial de Microsoft](https://visualstudio.microsoft.com/).
    - Durante la instalación, selecciona la carga de trabajo "Desarrollo web" y asegúrate de incluir el **.NET Framework 4.8**.
 
-2. **Instalar SQL Server Express**:
-   - Descarga e instala SQL Server Express desde el [sitio oficial de Microsoft](https://www.microsoft.com/en-us/sql-server/sql-server-downloads).
-   - Asegúrate de que la opción de **LocalDB** esté seleccionada durante la instalación.
+2. **Instalar SQL Server Express** (opcional):
+   - Si no tienes una instancia de SQL Server, puedes descargar e instalar [SQL Server Express](https://www.microsoft.com/en-us/sql-server/sql-server-downloads).
 
 ### Creación del Proyecto
 
@@ -23,35 +22,37 @@ Para configurar un entorno de desarrollo para un proyecto de Punto de Venta en V
    - Haz clic en "Siguiente".
 
 2. **Configurar el proyecto**:
-   - Asigna un nombre a tu proyecto, por ejemplo, `PuntoDeVenta`.
+   - Asigna un nombre a tu proyecto (por ejemplo, `PuntoDeVenta`).
    - Selecciona la ubicación donde deseas guardar el proyecto.
-   - Asegúrate de que la opción "Crear un repositorio Git" esté marcada si deseas usar control de versiones.
+   - Asegúrate de que la opción "Framework" esté configurada en **.NET Framework 4.8**.
    - Haz clic en "Crear".
 
 3. **Seleccionar plantilla de proyecto**:
-   - En la ventana de "Crear una nueva aplicación web", selecciona "Aplicación web (Modelo-Vista-Controlador)".
+   - En la ventana "Crear una nueva aplicación web", selecciona "Aplicación web (Modelo-Vista-Controlador)".
    - Marca la opción "Autenticación" y selecciona "Cuentas de usuario individuales".
    - Haz clic en "Crear".
 
 ### Configuración de la Cadena de Conexión a LocalDB
 
-1. **Modificar el archivo `Web.config`**:
+1. **Configurar la cadena de conexión**:
    - Abre el archivo `Web.config` en la raíz del proyecto.
-   - Busca la sección `<connectionStrings>` y modifica o añade la cadena de conexión para LocalDB. Debe verse algo así:
+   - Busca la sección `<connectionStrings>` y modifica o añade la siguiente cadena de conexión para usar LocalDB:
 
    ```xml
    <connectionStrings>
        <add name="DefaultConnection" 
-            connectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=PuntoDeVenta;Integrated Security=True;MultipleActiveResultSets=True" 
+            connectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=PuntoDeVentaDb;Integrated Security=True;MultipleActiveResultSets=True" 
             providerName="System.Data.SqlClient" />
    </connectionStrings>
    ```
 
-2. **Configurar Entity Framework (opcional)**:
-   - Si planeas usar Entity Framework, asegúrate de instalar el paquete NuGet correspondiente:
-     - Haz clic derecho en el proyecto en el Explorador de soluciones.
-     - Selecciona "Administrar paquetes NuGet".
-     - Busca "EntityFramework" e instálalo.
+2. **Crear la base de datos**:
+   - Abre la Consola del Administrador de Paquetes (Tools > NuGet Package Manager > Package Manager Console).
+   - Ejecuta el siguiente comando para crear la base de datos y las tablas necesarias:
+
+   ```powershell
+   Update-Database
+   ```
 
 ### Resumen
 
