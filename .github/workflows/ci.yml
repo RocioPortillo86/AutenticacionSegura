@@ -1,11 +1,14 @@
-name: CI - Soporte Tecnico RAG
+name: CI - Ejecutar Notebook y guardar resultados
 
 on:
+  workflow_dispatch: {}
   push:
     branches: [ main ]
-  pull_request:
+    paths:
+      - "PuntoVentas.ipynb"
+      - ".github/workflows/ci.yml"
+      - "requirements.txt"
 
-# 👇 Esto da permiso al workflow de hacer git push con GITHUB_TOKEN
 permissions:
   contents: write
 
@@ -15,71 +18,69 @@ jobs:
     timeout-minutes: 30
 
     env:
-      # 🔐 Llave de OpenAI (configúrala en Settings → Secrets → Actions)
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      DATA_DIR: data
-      PERSIST_DIR: chroma_db
-      MODEL_EMB: text-embedding-ada-002
-      LLM_MODEL: gpt-4o-mini
+      NOTEBOOK_FILE: PuntoVentas.ipynb   # <-- cambia aquí si tu archivo tiene otro nombre
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.10"
 
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
-
-      - name: Install dependencies
+      - name: Install deps
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install -U pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install jupyter nbconvert
 
-      - name: Debug - list files
+      - name: Ensure OPENAI_API_KEY present
         run: |
-          echo "PWD:" && pwd
-          echo "--- repo files ---" && ls -la
-          echo "--- data/ files ---" && ls -la data || true
+          test -n "${OPENAI_API_KEY}" || (echo "OPENAI_API_KEY no está definido como secret." && exit 1)
 
-      # 👉 Aquí ejecutas tu notebook, que genera resultados en la carpeta results/
-      - name: Run Jupyter Notebook
+      - name: Execute notebook
         run: |
-          jupyter nbconvert \
-            --to notebook \
-            --execute RETO_RAG.ipynb \
-            --output result.ipynb \
-            --ExecutePreprocessor.timeout=1200
+          jupyter nbconvert --to notebook --execute "$NOTEBOOK_FILE" \
+            --output executed.ipynb \
+            --ExecutePreprocessor.timeout=1200 \
+            --ExecutePreprocessor.kernel_name=python3
 
-      # 👇 Paso que hace commit y push de los resultados
+      - name: Ensure results folder
+        run: mkdir -p results
+
+      # Opcional: extraer salida de texto del notebook ejecutado
+      - name: Save text output to results/codigo_generado.cs
+        run: |
+          python - <<'PY'
+          import nbformat, os
+          nb = nbformat.read("executed.ipynb", as_version=4)
+          out_lines = []
+          for cell in nb.cells:
+              for o in cell.get("outputs", []):
+                  if o.get("output_type") == "stream" and o.get("text"):
+                      out_lines.append(o["text"])
+          os.makedirs("results", exist_ok=True)
+          with open("results/codigo_generado.cs","w",encoding="utf-8") as f:
+              f.write("\n".join(out_lines))
+          print("results/codigo_generado.cs escrito")
+          PY
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: executed-and-results
+          path: |
+            executed.ipynb
+            results/
+
       - name: Commit results (if any)
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add results/* || true
-          git commit -m "Add QA results $(date -u +%Y%m%d_%H%M)" || echo "No changes to commit"
-          git push
-
-      # Sube también los resultados como artefactos (opcional, para descargarlos de Actions)
-      - name: Save outputs (artifact)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: outputs
-          path: |
-            result.ipynb
-            results/
-          if-no-files-found: warn
-
-
+          git add executed.ipynb results/ || true
+          git commit -m "CI: update executed notebook and results" || echo "No changes"
+          git push || true
