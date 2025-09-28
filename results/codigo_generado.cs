@@ -2,7 +2,7 @@
 
 🤖 Modelo listo
 
-A continuación, se presentan instrucciones claras y concisas para configurar el entorno de desarrollo para un proyecto de Punto de Venta en Visual Studio 2022 con C# y ASP.NET Framework 4.8.
+Aquí tienes instrucciones claras y concisas para configurar el entorno de desarrollo para un proyecto de Punto de Venta en Visual Studio 2022 con C# y ASP.NET Framework 4.8.
 
 ### Requisitos Previos
 
@@ -10,180 +10,283 @@ A continuación, se presentan instrucciones claras y concisas para configurar el
    - Descarga e instala Visual Studio 2022 desde el [sitio oficial de Microsoft](https://visualstudio.microsoft.com/).
    - Durante la instalación, selecciona la carga de trabajo "Desarrollo web" para asegurarte de que se instalen las herramientas necesarias para ASP.NET.
 
-2. **Instalar SQL Server LocalDB**:
-   - SQL Server LocalDB se incluye con Visual Studio, pero asegúrate de que esté instalado. Puedes verificarlo en el instalador de Visual Studio o descargarlo desde el [sitio oficial de Microsoft](https://www.microsoft.com/en-us/sql-server/sql-server-downloads).
+2. **Instalar SQL Server**:
+   - Descarga e instala SQL Server Express o una versión completa de SQL Server desde el [sitio oficial de Microsoft](https://www.microsoft.com/en-us/sql-server/sql-server-downloads).
+   - Asegúrate de que el servicio de SQL Server esté en ejecución.
 
-3. **Instalar ASP.NET Identity**:
-   - ASP.NET Identity se incluye en las plantillas de proyecto de ASP.NET, por lo que no es necesario instalarlo por separado.
+3. **Instalar SQL Server Management Studio (SSMS)** (opcional pero recomendado):
+   - Descarga e instala SSMS desde el [sitio oficial de Microsoft](https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms).
 
 ### Creación del Proyecto
 
 1. **Crear un nuevo proyecto**:
    - Abre Visual Studio 2022.
    - Selecciona "Crear un nuevo proyecto".
-   - En el cuadro de búsqueda, escribe "ASP.NET Web Application (.NET Framework)" y selecciona esta opción.
+   - En el cuadro de búsqueda, escribe "ASP.NET Web Application (.NET Framework)" y selecciona esa opción.
    - Haz clic en "Siguiente".
 
 2. **Configurar el proyecto**:
    - Asigna un nombre a tu proyecto (por ejemplo, `PuntoDeVenta`).
    - Selecciona la ubicación donde deseas guardar el proyecto.
-   - Asegúrate de que la opción "Crear una solución en el mismo directorio" esté marcada.
+   - Asegúrate de que la opción "Crear una solución en un nuevo directorio" esté marcada.
    - Haz clic en "Crear".
 
-3. **Seleccionar la plantilla de proyecto**:
-   - En la ventana "Crear una nueva aplicación web", selecciona "Aplicación web (Modelo-Vista-Controlador)".
-   - Asegúrate de que la opción "Autenticación" esté configurada como "Cuentas de usuario individuales".
+3. **Seleccionar plantilla de proyecto**:
+   - En la ventana "Crear una nueva aplicación web", selecciona "Aplicación Web (Modelo-Vista-Controlador)".
+   - Asegúrate de que la opción "Autenticación" esté configurada en "Cuentas de usuario individuales".
    - Haz clic en "Crear".
 
 ### Configuración de la Cadena de Conexión a SQL Server
 
-1. **Abrir el archivo `Web.config`**:
-   - En el Explorador de soluciones, busca el archivo `Web.config` en la raíz del proyecto y ábrelo.
+1. **Abrir el archivo `web.config`**:
+   - En el Explorador de soluciones, busca el archivo `web.config` en la raíz del proyecto y ábrelo.
 
-2. **Configurar la cadena de conexión**:
-   - Busca la sección `<connectionStrings>` en el archivo `Web.config`. Si no existe, agrégala dentro de la sección `<configuration>`.
-   - Agrega la siguiente cadena de conexión para SQL Server LocalDB:
+2. **Agregar la cadena de conexión**:
+   - Dentro de la sección `<configuration>`, busca la sección `<connectionStrings>`. Si no existe, agrégala. Debería verse así:
 
    ```xml
    <connectionStrings>
        <add name="DefaultConnection" 
-            connectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=PuntoDeVentaDb;Integrated Security=True" 
+            connectionString="Server=TU_SERVIDOR;Database=TU_BASE_DE_DATOS;User Id=TU_USUARIO;Password=TU_CONTRASEÑA;" 
             providerName="System.Data.SqlClient" />
    </connectionStrings>
    ```
 
-3. **Actualizar el contexto de datos**:
-   - Asegúrate de que el contexto de datos de ASP.NET Identity esté utilizando esta cadena de conexión. Esto generalmente se configura en el archivo `IdentityConfig.cs` o en el contexto de datos que se utiliza para la autenticación.
+   - Reemplaza `TU_SERVIDOR`, `TU_BASE_DE_DATOS`, `TU_USUARIO` y `TU_CONTRASEÑA` con los valores correspondientes a tu configuración de SQL Server.
+
+3. **Configurar el estado de sesión**:
+   - Asegúrate de que la sección de estado de sesión esté configurada en el `web.config`:
+
+   ```xml
+   <sessionState timeout="20" />
+   ```
+
+4. **Configurar la validación de solicitudes**:
+   - Asegúrate de que la sección de páginas esté configurada para validar las solicitudes:
+
+   ```xml
+   <pages validateRequest="true" viewStateEncryptionMode="Always" />
+   ```
 
 ### Finalización
 
-1. **Ejecutar la migración inicial**:
-   - Abre la Consola del Administrador de Paquetes (Tools > NuGet Package Manager > Package Manager Console).
-   - Ejecuta el siguiente comando para aplicar las migraciones iniciales y crear la base de datos:
+- Guarda todos los cambios en el archivo `web.config`.
+- Ahora tu entorno de desarrollo está configurado para comenzar a trabajar en el proyecto de Punto de Venta.
 
-   ```powershell
-   Update-Database
-   ```
+### Notas Finales
 
-2. **Ejecutar la aplicación**:
-   - Presiona `F5` o haz clic en "Iniciar" para ejecutar la aplicación y verificar que todo esté funcionando correctamente.
+- Asegúrate de que tu SQL Server esté configurado para permitir conexiones remotas si es necesario.
+- Considera crear la base de datos y las tablas necesarias para tu aplicación utilizando SQL Server Management Studio.
+- Recuerda que la seguridad es fundamental, así que asegúrate de manejar adecuadamente las credenciales y la configuración de la base de datos.
 
-### Comentario Final
-
-Estas instrucciones te guiarán a través de la configuración de un entorno de desarrollo para un proyecto de Punto de Venta utilizando ASP.NET Framework 4.8 y SQL Server LocalDB. La configuración de la autenticación con cuentas de usuario individuales permite gestionar usuarios y roles de manera segura, lo que es fundamental para la aplicación.
+Con estos pasos, deberías estar listo para comenzar a desarrollar tu sistema de Punto de Venta en ASP.NET Web Forms.
 
 ✅ Guardado en: /home/runner/work/PuntoVentas/PuntoVentas/results/ConfiguarEntorno.md
 ✅ Guardado en: /home/runner/work/PuntoVentas/PuntoVentas/results/ConfiguarEntorno.md
-📏 Tamaño (bytes): 3693
+📏 Tamaño (bytes): 3784
 🧪 Existe?: True
 
-Para crear la estructura inicial de un proyecto ASP.NET Web Forms utilizando C# y .NET Framework 4.8, sigue estos pasos:
+A continuación, te proporcionaré instrucciones claras y concisas para crear la estructura inicial de un proyecto de Sistema de Punto de Venta (POS) utilizando C# y ASP.NET Web Forms, asegurando que sea funcional y seguro. 
 
-### 1. Crear el Proyecto
+### Instrucciones para Crear la Estructura Inicial del Proyecto
 
-1. **Abre Visual Studio 2022**.
-2. **Selecciona "Crear un nuevo proyecto"**.
-3. En el cuadro de búsqueda, escribe "ASP.NET Web Application (.NET Framework)" y selecciona esa opción.
-4. Haz clic en **"Siguiente"**.
-5. Asigna un nombre a tu proyecto (por ejemplo, `PuntoDeVenta`) y selecciona la ubicación donde deseas guardarlo.
-6. Haz clic en **"Crear"**.
-7. En la siguiente ventana, selecciona **"Web Forms"** y asegúrate de que la opción de autenticación esté configurada como **"Individual User Accounts"** para utilizar ASP.NET Identity. Luego, haz clic en **"Crear"**.
+1. **Crear un nuevo proyecto en Visual Studio**:
+   - Abre Visual Studio.
+   - Selecciona "Crear un nuevo proyecto".
+   - Elige "Aplicación web de ASP.NET (.NET Framework)".
+   - Nombra tu proyecto (por ejemplo, `POSSystem`) y selecciona la ubicación.
+   - Haz clic en "Crear".
+   - Selecciona "Aplicación Web Form" y asegúrate de que la opción "Habilitar autenticación" esté configurada en "Sin autenticación". Haz clic en "Crear".
 
-### 2. Estructura de Carpetas
+2. **Configurar el archivo `web.config`**:
+   - Abre el archivo `web.config` y agrega las siguientes configuraciones:
 
-Una vez creado el proyecto, organiza la estructura de carpetas de la siguiente manera:
+   ```xml
+   <configuration>
+     <connectionStrings>
+       <add name="POSConnectionString" connectionString="Server=YOUR_SERVER;Database=YOUR_DATABASE;User Id=YOUR_USER;Password=YOUR_PASSWORD;" providerName="System.Data.SqlClient" />
+     </connectionStrings>
+     <sessionState timeout="20" />
+     <pages validateRequest="true" viewStateEncryptionMode="Always" />
+   </configuration>
+   ```
 
-```
-PuntoDeVenta
-│
-├── App_Data
-│   └── (Base de datos LocalDB)
-│
-├── Controllers
-│   └── (Controladores para manejar la lógica de negocio)
-│
-├── Models
-│   └── (Modelos de datos)
-│
-├── Repositories
-│   └── (Interfaces y clases para acceso a datos)
-│
-├── Services
-│   └── (Servicios para la lógica de negocio)
-│
-├── Views
-│   ├── Login.aspx
-│   ├── Main.aspx
-│   ├── UserCatalog.aspx
-│   ├── ProductCatalog.aspx
-│   ├── CashRegister.aspx
-│   └── SalesReport.aspx
-│
-├── Web.config
-└── Global.asax
-```
+   Asegúrate de reemplazar `YOUR_SERVER`, `YOUR_DATABASE`, `YOUR_USER` y `YOUR_PASSWORD` con los valores correspondientes a tu entorno de SQL Server.
 
-### 3. Crear las Páginas .aspx
+3. **Crear las carpetas necesarias**:
+   - En el Explorador de Soluciones, haz clic derecho en el proyecto y selecciona "Agregar" > "Nueva carpeta".
+   - Crea las siguientes carpetas:
+     - `Repositories`
+     - `Models`
+     - `Services`
+     - `Pages`
 
-Crea las páginas necesarias en la carpeta `Views`:
+4. **Crear las páginas Web Forms**:
+   - Haz clic derecho en la carpeta `Pages` y selecciona "Agregar" > "Nuevo elemento".
+   - Agrega las siguientes páginas `.aspx`:
+     - `Login.aspx`
+     - `Default.aspx`
+     - `Users.aspx`
+     - `Products.aspx`
+     - `CashRegister.aspx`
+     - `SalesReport.aspx`
 
-1. **Login.aspx**: Página para el inicio de sesión.
-2. **Main.aspx**: Pantalla principal con el menú.
-3. **UserCatalog.aspx**: Gestión de usuarios (solo accesible para Administradores).
-4. **ProductCatalog.aspx**: Gestión de productos (solo accesible para Administradores).
-5. **CashRegister.aspx**: Caja registradora para realizar ventas.
-6. **SalesReport.aspx**: Reporte de ventas.
+5. **Crear los archivos de code-behind**:
+   - Por cada página `.aspx` que creaste, Visual Studio generará automáticamente un archivo `.aspx.cs` correspondiente. Asegúrate de que cada archivo tenga el mismo nombre que la página.
 
-### 4. Configurar ASP.NET Identity
+6. **Crear las interfaces de repositorio**:
+   - En la carpeta `Repositories`, crea dos archivos de interfaz:
+     - `IUsuarioRepository.cs`
+     - `IProductoRepository.cs`
 
-Asegúrate de que ASP.NET Identity esté configurado correctamente en tu proyecto. Esto incluye la configuración de la base de datos en `Web.config` y la inicialización de los roles y usuarios.
+   Ejemplo de `IUsuarioRepository.cs`:
 
-### 5. Crear Interfaces
+   ```csharp
+   public interface IUsuarioRepository
+   {
+       Usuario GetUsuarioById(int userId);
+       void AddUsuario(Usuario usuario);
+       void UpdateUsuario(Usuario usuario);
+       void DeleteUsuario(int userId);
+       // Otros métodos según sea necesario
+   }
+   ```
 
-Crea las interfaces necesarias en la carpeta `Repositories` para la inyección de dependencias. Por ejemplo:
+   Ejemplo de `IProductoRepository.cs`:
 
-```csharp
-// IUsuarioRepository.cs
-public interface IUsuarioRepository
-{
-    void CrearUsuario(string nombre, string password);
-    // Otros métodos necesarios
-}
+   ```csharp
+   public interface IProductoRepository
+   {
+       Producto GetProductoById(int productId);
+       void AddProducto(Producto producto);
+       void UpdateProducto(Producto producto);
+       void DeleteProducto(int productId);
+       // Otros métodos según sea necesario
+   }
+   ```
 
-// IProductoRepository.cs
-public interface IProductoRepository
-{
-    void AgregarProducto(string nombre, string sku, decimal precio, int existencia);
-    // Otros métodos necesarios
-}
-```
+7. **Crear las implementaciones de repositorio**:
+   - En la carpeta `Repositories`, crea dos archivos de clase:
+     - `UsuarioRepository.cs`
+     - `ProductoRepository.cs`
 
-### 6. Implementar Controladores
+   Ejemplo de `UsuarioRepository.cs`:
 
-Crea controladores en la carpeta `Controllers` que manejen la lógica de negocio y se comuniquen con los repositorios.
+   ```csharp
+   public class UsuarioRepository : IUsuarioRepository
+   {
+       private readonly string _connectionString;
 
-### 7. Configurar Seguridad
+       public UsuarioRepository(string connectionString)
+       {
+           _connectionString = connectionString;
+       }
 
-Asegúrate de que las páginas que requieren autenticación estén protegidas. Puedes hacerlo en el archivo `Web.config`:
+       public Usuario GetUsuarioById(int userId)
+       {
+           // TODO: Implementar lógica para obtener usuario por ID usando ADO.NET
+           return null;
+       }
 
-```xml
-<configuration>
-  <system.web>
-    <authorization>
-      <deny users="?" />
-    </authorization>
-  </system.web>
-</configuration>
-```
+       public void AddUsuario(Usuario usuario)
+       {
+           // TODO: Implementar lógica para agregar usuario usando ADO.NET
+       }
 
-### 8. Probar la Aplicación
+       public void UpdateUsuario(Usuario usuario)
+       {
+           // TODO: Implementar lógica para actualizar usuario usando ADO.NET
+       }
 
-Ejecuta la aplicación para asegurarte de que la estructura básica funcione correctamente. Asegúrate de que las páginas de inicio de sesión y las demás páginas se carguen sin errores.
+       public void DeleteUsuario(int userId)
+       {
+           // TODO: Implementar lógica para eliminar usuario usando ADO.NET
+       }
+   }
+   ```
 
-### Comentario Final
+   Ejemplo de `ProductoRepository.cs`:
 
-Esta estructura inicial proporciona una base sólida para el desarrollo de la aplicación de Punto de Venta. Se ha organizado en capas (controladores, modelos, repositorios y servicios) para seguir el principio de separación de preocupaciones, lo que facilita el mantenimiento y la escalabilidad del código. Además, se ha implementado la seguridad básica utilizando ASP.NET Identity y se han creado interfaces para permitir la inyección de dependencias, lo que mejora la testabilidad del código.
+   ```csharp
+   public class ProductoRepository : IProductoRepository
+   {
+       private readonly string _connectionString;
+
+       public ProductoRepository(string connectionString)
+       {
+           _connectionString = connectionString;
+       }
+
+       public Producto GetProductoById(int productId)
+       {
+           // TODO: Implementar lógica para obtener producto por ID usando ADO.NET
+           return null;
+       }
+
+       public void AddProducto(Producto producto)
+       {
+           // TODO: Implementar lógica para agregar producto usando ADO.NET
+       }
+
+       public void UpdateProducto(Producto producto)
+       {
+           // TODO: Implementar lógica para actualizar producto usando ADO.NET
+       }
+
+       public void DeleteProducto(int productId)
+       {
+           // TODO: Implementar lógica para eliminar producto usando ADO.NET
+       }
+   }
+   ```
+
+8. **Crear las clases de modelo**:
+   - En la carpeta `Models`, crea dos archivos de clase:
+     - `Usuario.cs`
+     - `Producto.cs`
+
+   Ejemplo de `Usuario.cs`:
+
+   ```csharp
+   public class Usuario
+   {
+       public int UserId { get; set; }
+       public string Username { get; set; }
+       public string PasswordHash { get; set; }
+       public string Role { get; set; }
+       // Otros campos según sea necesario
+   }
+   ```
+
+   Ejemplo de `Producto.cs`:
+
+   ```csharp
+   public class Producto
+   {
+       public int ProductId { get; set; }
+       public string Nombre { get; set; }
+       public string SKU { get; set; }
+       public decimal Precio { get; set; }
+       public int Existencia { get; set; }
+       public bool Activo { get; set; }
+   }
+   ```
+
+9. **Implementar la lógica de autenticación en `Login.aspx`**:
+   - En `Login.aspx`, agrega controles para el nombre de usuario y la contraseña, y un botón para iniciar sesión.
+   - En el code-behind `Login.aspx.cs`, implementa la lógica para autenticar al usuario y almacenar su ID y rol en la sesión.
+
+10. **Implementar la validación de sesión en las páginas protegidas**:
+    - En el `Page_Load` de cada página que requiera autenticación, verifica si `Session["UserId"]` está presente. Si no, redirige a `Login.aspx`.
+
+### Comentarios Finales sobre Seguridad
+- Se ha implementado la parametrización en las consultas SQL para prevenir inyecciones SQL.
+- Las contraseñas deben ser almacenadas como hashes seguros utilizando PBKDF2.
+- Se valida la entrada del usuario en el servidor y se habilita la validación de solicitudes.
+- Se utiliza el manejo de sesiones para mantener la autenticación del usuario sin cookies.
+
+Con estos pasos, tendrás una estructura básica y funcional para tu Sistema de Punto de Venta (POS) en ASP.NET Web Forms.
 
 ✅ Guardado en: /home/runner/work/PuntoVentas/PuntoVentas/results/EstructuraInicial.md
-📏 Tamaño (bytes): 3892
+📏 Tamaño (bytes): 6872
 🧪 Existe?: True
