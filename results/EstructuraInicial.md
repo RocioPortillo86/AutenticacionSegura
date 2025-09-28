@@ -18,17 +18,17 @@ A continuación, se presentan instrucciones claras y concisas para configurar el
 1. **Crear un nuevo proyecto**:
    - Abre Visual Studio 2022.
    - Selecciona "Crear un nuevo proyecto".
-   - En el cuadro de búsqueda, escribe "ASP.NET Web Application (.NET Framework)" y selecciona esta opción.
+   - En el cuadro de búsqueda, escribe "ASP.NET Web Application (.NET Framework)" y selecciona la plantilla.
    - Haz clic en "Siguiente".
 
 2. **Configurar el proyecto**:
-   - Asigna un nombre a tu proyecto (por ejemplo, `PuntoDeVenta`).
+   - Asigna un nombre al proyecto, por ejemplo, `PuntoDeVenta`.
    - Selecciona la ubicación donde deseas guardar el proyecto.
-   - Asegúrate de que la opción "Crear una solución en el mismo directorio" esté marcada.
+   - Asegúrate de que la opción "Crear un repositorio Git" esté marcada si deseas usar control de versiones.
    - Haz clic en "Crear".
 
 3. **Seleccionar la plantilla de proyecto**:
-   - En la ventana "Crear una nueva aplicación web ASP.NET", selecciona "Aplicación Web (Modelo-Vista-Controlador)".
+   - En la ventana "Crear una nueva aplicación web", selecciona "Aplicación Web (Modelo-Vista-Controlador)".
    - Asegúrate de que la opción "Autenticación" esté configurada como "Cuentas de usuario individuales".
    - Haz clic en "Crear".
 
@@ -49,22 +49,14 @@ A continuación, se presentan instrucciones claras y concisas para configurar el
    </connectionStrings>
    ```
 
-3. **Actualizar el contexto de datos**:
-   - Asegúrate de que el contexto de datos esté utilizando la cadena de conexión que acabas de definir. Esto generalmente se hace en la clase `ApplicationDbContext` que se genera automáticamente.
-
-### Finalización
-
-1. **Ejecutar la migración inicial**:
+3. **Actualizar la base de datos**:
    - Abre la Consola del Administrador de Paquetes (Tools > NuGet Package Manager > Package Manager Console).
-   - Ejecuta el siguiente comando para crear la base de datos inicial:
+   - Ejecuta el siguiente comando para aplicar las migraciones y crear la base de datos:
 
    ```powershell
    Update-Database
    ```
 
-2. **Ejecutar la aplicación**:
-   - Presiona `F5` o haz clic en "Iniciar" para ejecutar la aplicación y verificar que todo esté funcionando correctamente.
+### Resumen
 
-### Comentario Final
-
-Estas instrucciones te guiarán a través de la configuración de un entorno de desarrollo para un proyecto de Punto de Venta utilizando ASP.NET Framework 4.8 y SQL Server LocalDB. La configuración de la autenticación con cuentas de usuario individuales permite gestionar usuarios y roles de manera segura, lo cual es fundamental para la aplicación.
+Con estos pasos, has configurado el entorno de desarrollo para un proyecto de Punto de Venta en Visual Studio 2022 utilizando C# y ASP.NET Framework 4.8. Has creado un nuevo proyecto con autenticación de cuentas de usuario individuales y configurado la cadena de conexión a SQL Server LocalDB. Ahora puedes comenzar a desarrollar las funcionalidades requeridas para tu aplicación.
