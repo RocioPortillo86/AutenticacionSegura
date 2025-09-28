@@ -3,11 +3,7 @@ name: CI - Ejecutar Notebook y guardar resultados
 on:
   workflow_dispatch: {}
   push:
-    branches: [ main ]
-    paths:
-      - "PuntoVentas.ipynb"
-      - ".github/workflows/ci.yml"
-      - "requirements.txt"
+    branches: [ main ]   # ejecuta en cualquier cambio a main
 
 permissions:
   contents: write
@@ -19,7 +15,7 @@ jobs:
 
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      NOTEBOOK_FILE: PuntoVentas.ipynb   # <-- cambia aquí si tu archivo tiene otro nombre
+      NOTEBOOK_FILE: PuntoVentas.ipynb   # cambia el nombre si tu notebook es otro
 
     steps:
       - name: Checkout repo
@@ -52,7 +48,6 @@ jobs:
       - name: Ensure results folder
         run: mkdir -p results
 
-      # Opcional: extraer salida de texto del notebook ejecutado
       - name: Save text output to results/codigo_generado.cs
         run: |
           python - <<'PY'
