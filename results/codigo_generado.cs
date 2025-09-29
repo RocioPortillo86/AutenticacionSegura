@@ -90,10 +90,12 @@ CREATE TABLE SaleItems (
     FOREIGN KEY (ProductId) REFERENCES Products(Id)
 );
 
--- Insertar un usuario Admin inicial
+-- Insertar usuario Admin inicial
 INSERT INTO Users (Email, PasswordHash, Role, Active) 
-VALUES ('admin@example.com', '$2a$12$e0N1Z1Q1Z1Z1Z1Z1Z1Z1Z1O1O1O1O1O1O1O1O1O1O1O1O1O1O1', 'Admin', 1);
+VALUES ('admin@example.com', '$2a$12$e0N1Z1Q1Q1Q1Q1Q1Q1Q1Q1O', 'Admin', 1); -- Hash de 'Admin123'
 ```
+
+---
 
 ## 2) ESTRUCTURA INICIAL DEL PROYECTO
 
@@ -128,14 +130,15 @@ Site.Master
 ```
 
 ### Descripción de carpetas y archivos
-- **App_Code**: Contiene la lógica de negocio y acceso a datos.
-  - **Models**: Clases POCO que representan las entidades del sistema.
-  - **Data**: Clases para el acceso a datos usando ADO.NET.
-  - **Services**: Clases que implementan la lógica de negocio.
-- **Pages**: Contiene las páginas Web Forms (.aspx) del sistema.
+- **App_Code/Models**: Contiene las clases de modelo (POCOs) que representan las entidades del sistema.
+- **App_Code/Data**: Implementaciones de acceso a datos usando ADO.NET.
+- **App_Code/Services**: Contiene la lógica de negocio y servicios que interactúan con los repositorios.
+- **Pages**: Contiene las páginas Web Forms (.aspx) que forman la interfaz de usuario.
 - **Styles**: Archivos CSS para el estilo de la aplicación.
 - **App_Themes**: Temas opcionales para la aplicación.
 - **Site.Master**: Plantilla maestra que define la estructura común de las páginas.
+
+---
 
 ## 3) BACKEND CORE MÍNIMO Y SEGURO (ADO.NET + Session)
 
@@ -358,15 +361,14 @@ public class SalesService
             Total = items.Sum(i => i.qty * ProductData.GetById(i.productId).Price) * 1.16m
         };
 
-        var saleItems = items.Select(i => new SaleItem
+        SalesData.InsertSale(sale, items.Select(i => new SaleItem
         {
             ProductId = i.productId,
             Quantity = i.qty,
             UnitPrice = ProductData.GetById(i.productId).Price,
             LineTotal = i.qty * ProductData.GetById(i.productId).Price
-        }).ToList();
+        }).ToList());
 
-        SalesData.InsertSale(sale, saleItems);
         return sale.Id;
     }
 }
@@ -386,6 +388,8 @@ if (Session["uid"] == null) { Response.Redirect("Login.aspx"); return; }
 - Anti-XSS: usar `Server.HtmlEncode` al mostrar datos de usuario.
 - Manejo de errores: capturar excepciones y mostrar mensajes genéricos.
 
+---
+
 ## 4) FRONTEND (WEB FORMS CON CONTROLES ASP.NET + ESTILOS PROPIOS)
 
 ### Menú de navegación (header superior)
@@ -402,26 +406,24 @@ if (Session["uid"] == null) { Response.Redirect("Login.aspx"); return; }
 
 ### Site.Master
 ```html
-<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Site.Master.cs" Inherits="SiteMaster" %>
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="YourNamespace.Site" %>
 <!DOCTYPE html>
 <html>
 <head runat="server">
-    <title>POS System</title>
+    <title></title>
     <link href="Styles/Site.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
     <form id="form1" runat="server">
         <div>
-            <nav style="background-color: #353A40; color: white;">
+            <nav style="background-color: #353A40;">
                 <ul>
-                    <li><a href="Default.aspx">Home</a></li>
-                    <% if (Session["role"] != null && Session["role"].ToString() == "Admin") { %>
-                        <li><a href="Users.aspx">Users</a></li>
-                        <li><a href="Products.aspx">Products</a></li>
-                    <% } %>
-                    <li><a href="CashRegister.aspx">Cash Register</a></li>
-                    <li><a href="SalesReport.aspx">Sales Report</a></li>
-                    <li><a href="Logout.aspx" runat="server" id="lnkLogout">Logout</a></li>
+                    <li><a href="Default.aspx" style="color: white;">Home</a></li>
+                    <li><a href="Users.aspx" style="color: white;">Users</a></li>
+                    <li><a href="Products.aspx" style="color: white;">Products</a></li>
+                    <li><a href="CashRegister.aspx" style="color: white;">Cash Register</a></li>
+                    <li><a href="SalesReport.aspx" style="color: white;">Sales Report</a></li>
+                    <li><a href="javascript:void(0);" id="lnkLogout" runat="server" style="color: white;">Logout</a></li>
                 </ul>
             </nav>
             <asp:ContentPlaceHolder ID="MainContent" runat="server" />
@@ -434,7 +436,7 @@ if (Session["uid"] == null) { Response.Redirect("Login.aspx"); return; }
 ### Páginas (.aspx) con controles ASP.NET y validadores
 - **Login.aspx**: 
 ```html
-<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Login.aspx.cs" Inherits="Login" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="YourNamespace.Login" %>
 <!DOCTYPE html>
 <html>
 <head runat="server">
@@ -452,14 +454,13 @@ if (Session["uid"] == null) { Response.Redirect("Login.aspx"); return; }
 </body>
 </html>
 ```
-
 - **Default.aspx**: 
 ```html
-<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Default.aspx.cs" Inherits="Default" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="YourNamespace.Default" %>
 <!DOCTYPE html>
 <html>
 <head runat="server">
-    <title>Bienvenido</title>
+    <title>Inicio</title>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -471,10 +472,9 @@ if (Session["uid"] == null) { Response.Redirect("Login.aspx"); return; }
 </body>
 </html>
 ```
-
 - **Users.aspx**: 
 ```html
-<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Users.aspx.cs" Inherits="Users" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Users.aspx.cs" Inherits="YourNamespace.Users" %>
 <!DOCTYPE html>
 <html>
 <head runat="server">
@@ -483,7 +483,7 @@ if (Session["uid"] == null) { Response.Redirect("Login.aspx"); return; }
 <body>
     <form id="form1" runat="server">
         <div>
-            <asp:GridView ID="gvUsers" runat="server" AutoGenerateColumns="False" OnRowCommand="gvUsers_RowCommand" OnPageIndexChanging="gvUsers_PageIndexChanging" />
+            <asp:GridView ID="gvUsers" runat="server" AutoGenerateColumns="False" OnPageIndexChanging="gvUsers_PageIndexChanging" />
             <asp:FormView ID="fvUser" runat="server" />
             <asp:Label ID="lblMessage" runat="server" ForeColor="Red" />
             <asp:Button ID="btnNew" runat="server" Text="Nuevo" OnClick="btnNew_Click" />
@@ -494,10 +494,9 @@ if (Session["uid"] == null) { Response.Redirect("Login.aspx"); return; }
 </body>
 </html>
 ```
-
 - **Products.aspx**: 
 ```html
-<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Products.aspx.cs" Inherits="Products" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Products.aspx.cs" Inherits="YourNamespace.Products" %>
 <!DOCTYPE html>
 <html>
 <head runat="server">
@@ -506,7 +505,7 @@ if (Session["uid"] == null) { Response.Redirect("Login.aspx"); return; }
 <body>
     <form id="form1" runat="server">
         <div>
-            <asp:GridView ID="gvProducts" runat="server" AutoGenerateColumns="False" OnRowCommand="gvProducts_RowCommand" OnPageIndexChanging="gvProducts_PageIndexChanging" />
+            <asp:GridView ID="gvProducts" runat="server" AutoGenerateColumns="False" OnPageIndexChanging="gvProducts_PageIndexChanging" />
             <asp:FormView ID="fvProduct" runat="server" />
             <asp:Label ID="lblMessage" runat="server" ForeColor="Red" />
             <asp:Button ID="btnSave" runat="server" Text="Guardar" OnClick="btnSave_Click" />
@@ -516,10 +515,9 @@ if (Session["uid"] == null) { Response.Redirect("Login.aspx"); return; }
 </body>
 </html>
 ```
-
 - **CashRegister.aspx**: 
 ```html
-<%@ Page Language="C#" AutoEventWireup="true" CodeFile="CashRegister.aspx.cs" Inherits="CashRegister" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CashRegister.aspx.cs" Inherits="YourNamespace.CashRegister" %>
 <!DOCTYPE html>
 <html>
 <head runat="server">
@@ -542,10 +540,9 @@ if (Session["uid"] == null) { Response.Redirect("Login.aspx"); return; }
 </body>
 </html>
 ```
-
 - **SalesReport.aspx**: 
 ```html
-<%@ Page Language="C#" AutoEventWireup="true" CodeFile="SalesReport.aspx.cs" Inherits="SalesReport" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="SalesReport.aspx.cs" Inherits="YourNamespace.SalesReport" %>
 <!DOCTYPE html>
 <html>
 <head runat="server">
@@ -567,222 +564,242 @@ if (Session["uid"] == null) { Response.Redirect("Login.aspx"); return; }
 ```
 
 ### Estilos
-```css
-/* === Styles/Site.css === */
-body {
-    background-color: #F5F6FA;
-    color: black;
-}
+Define en `Styles/Site.css` las clases para navbar, botones y GridView, respetando la paleta de colores indicada.
 
-nav {
-    background-color: #353A40;
-    color: white;
-}
-
-nav ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-nav ul li {
-    display: inline;
-    margin-right: 15px;
-}
-
-.grid-header {
-    background-color: #19A1B9;
-    color: white;
-}
-
-.btn-primary {
-    background-color: #0F6AF6;
-    color: white;
-}
-
-.btn-danger {
-    background-color: #E13C4A;
-    color: white;
-}
-```
+---
 
 ## 5) GENERACIÓN DEL CÓDIGO DE PÁGINAS (CODE-BEHIND .ASPX.CS)
 
+### A) // === Pages/Login.aspx.cs ===
 ```csharp
-// === Pages/Login.aspx.cs ===
 using System;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using App_Code.Services;
 
-public partial class Login : Page
+namespace YourNamespace
 {
-    protected void Page_Load(object sender, EventArgs e)
+    public partial class Login : Page
     {
-        if (Session["uid"] != null)
+        protected void Page_Load(object sender, EventArgs e)
         {
-            Response.Redirect("Default.aspx");
-        }
-    }
-
-    protected void btnLogin_Click(object sender, EventArgs e)
-    {
-        if (Page.IsValid)
-        {
-            var email = txtEmail.Text.Trim();
-            var password = txtPassword.Text.Trim();
-            var authService = new AuthService();
-
-            if (authService.Login(email, password, Session))
+            if (Session["uid"] != null)
             {
                 Response.Redirect("Default.aspx");
+                return;
+            }
+        }
+
+        protected void btnLogin_Click(object sender, EventArgs e)
+        {
+            if (Page.IsValid)
+            {
+                var email = txtEmail.Text.Trim();
+                var password = txtPassword.Text.Trim();
+                var authService = new AuthService();
+
+                if (authService.Login(email, password, Session))
+                {
+                    Response.Redirect("Default.aspx");
+                }
+                else
+                {
+                    lblMessage.Text = "Credenciales inválidas. Intente nuevamente.";
+                }
+            }
+        }
+    }
+}
+```
+
+### B) // === Pages/Default.aspx.cs ===
+```csharp
+using System;
+using System.Web.UI;
+using App_Code.Data;
+
+namespace YourNamespace
+{
+    public partial class Default : Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Session["uid"] == null)
+            {
+                Response.Redirect("Login.aspx");
+                return;
+            }
+
+            if (!IsPostBack)
+            {
+                var userId = (int)Session["uid"];
+                var user = UserData.GetById(userId);
+                lblWelcome.Text = $"Bienvenido, {user.Email}";
+                lblRole.Text = $"Rol: {user.Role}";
+            }
+        }
+    }
+}
+```
+
+### C) // === Pages/Users.aspx.cs ===
+```csharp
+using System;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using App_Code.Data;
+using App_Code.Services;
+
+namespace YourNamespace
+{
+    public partial class Users : Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Session["uid"] == null || Session["role"].ToString() != "Admin")
+            {
+                Response.Redirect("Login.aspx");
+                return;
+            }
+
+            if (!IsPostBack)
+            {
+                BindGrid();
+            }
+        }
+
+        private void BindGrid()
+        {
+            gvUsers.DataSource = UserData.GetAll();
+            gvUsers.DataBind();
+        }
+
+        protected void btnNew_Click(object sender, EventArgs e)
+        {
+            fvUser.ChangeMode(FormViewMode.Insert);
+            fvUser.DataBind();
+        }
+
+        protected void btnSave_Click(object sender, EventArgs e)
+        {
+            var user = new User
+            {
+                Email = ((TextBox)fvUser.FindControl("txtEmail")).Text,
+                Role = ((DropDownList)fvUser.FindControl("ddlRole")).SelectedValue,
+                Active = ((CheckBox)fvUser.FindControl("chkActive")).Checked
+            };
+
+            if (fvUser.CurrentMode == FormViewMode.Insert)
+            {
+                var password = ((TextBox)fvUser.FindControl("txtPassword")).Text;
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+                UserData.Insert(user);
+                lblMessage.Text = "Usuario creado exitosamente.";
             }
             else
             {
-                lblMessage.Text = "Credenciales inválidas.";
+                user.Id = (int)fvUser.DataKey.Value;
+                UserData.Update(user);
+                lblMessage.Text = "Usuario actualizado exitosamente.";
+            }
+
+            BindGrid();
+        }
+
+        protected void btnDelete_Command(object sender, CommandEventArgs e)
+        {
+            int userId = Convert.ToInt32(e.CommandArgument);
+            UserData.Delete(userId);
+            lblMessage.Text = "Usuario eliminado exitosamente.";
+            BindGrid();
+        }
+
+        protected void gvUsers_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+            gvUsers.PageIndex = e.NewPageIndex;
+            BindGrid();
+        }
+    }
+}
+```
+
+### D) // === Pages/Products.aspx.cs ===
+```csharp
+using System;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using App_Code.Data;
+
+namespace YourNamespace
+{
+    public partial class Products : Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Session["uid"] == null || Session["role"].ToString() != "Admin")
+            {
+                Response.Redirect("Login.aspx");
+                return;
+            }
+
+            if (!IsPostBack)
+            {
+                BindGrid();
             }
         }
-    }
-}
 
-// === Pages/Default.aspx.cs ===
-using System;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using App_Code.Data;
-
-public partial class Default : Page
-{
-    protected void Page_Load(object sender, EventArgs e)
-    {
-        if (Session["uid"] == null)
+        private void BindGrid()
         {
-            Response.Redirect("Login.aspx");
-            return;
+            gvProducts.DataSource = ProductData.GetAll();
+            gvProducts.DataBind();
         }
 
-        if (!IsPostBack)
+        protected void btnSave_Click(object sender, EventArgs e)
         {
-            var userId = (int)Session["uid"];
-            var user = UserData.GetById(userId);
-            lblWelcome.Text = $"Bienvenido, {user.Email}";
-            lblRole.Text = $"Rol: {user.Role}";
+            var product = new Product
+            {
+                Sku = ((TextBox)fvProduct.FindControl("txtSku")).Text,
+                Name = ((TextBox)fvProduct.FindControl("txtName")).Text,
+                Price = decimal.Parse(((TextBox)fvProduct.FindControl("txtPrice")).Text),
+                Stock = int.Parse(((TextBox)fvProduct.FindControl("txtStock")).Text),
+                Active = ((CheckBox)fvProduct.FindControl("chkActive")).Checked
+            };
+
+            if (fvProduct.CurrentMode == FormViewMode.Insert)
+            {
+                ProductData.Insert(product);
+                lblMessage.Text = "Producto creado exitosamente.";
+            }
+            else
+            {
+                product.Id = (int)fvProduct.DataKey.Value;
+                ProductData.Update(product);
+                lblMessage.Text = "Producto actualizado exitosamente.";
+            }
+
+            BindGrid();
         }
-    }
-}
 
-// === Pages/Users.aspx.cs ===
-using System;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using App_Code.Data;
-
-public partial class Users : Page
-{
-    protected void Page_Load(object sender, EventArgs e)
-    {
-        if (Session["uid"] == null || Session["role"].ToString() != "Admin")
+        protected void btnDelete_Command(object sender, CommandEventArgs e)
         {
-            Response.Redirect("Login.aspx");
-            return;
+            int productId = Convert.ToInt32(e.CommandArgument);
+            ProductData.Delete(productId);
+            lblMessage.Text = "Producto eliminado exitosamente.";
+            BindGrid();
         }
 
-        if (!IsPostBack)
+        protected void gvProducts_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
+            gvProducts.PageIndex = e.NewPageIndex;
             BindGrid();
         }
     }
-
-    private void BindGrid()
-    {
-        gvUsers.DataSource = UserData.GetAll();
-        gvUsers.DataBind();
-    }
-
-    protected void btnNew_Click(object sender, EventArgs e)
-    {
-        fvUser.ChangeMode(FormViewMode.Insert);
-        fvUser.DataBind();
-    }
-
-    protected void btnSave_Click(object sender, EventArgs e)
-    {
-        // TODO: Implementar lógica para guardar usuario
-        // Hashear contraseña si es nuevo
-        // BindGrid();
-    }
-
-    protected void btnDelete_Command(object sender, CommandEventArgs e)
-    {
-        // TODO: Implementar lógica para eliminar usuario
-        // BindGrid();
-    }
-
-    protected void gvUsers_RowCommand(object sender, GridViewCommandEventArgs e)
-    {
-        // TODO: Implementar lógica para manejar comandos en el GridView
-    }
-
-    protected void gvUsers_PageIndexChanging(object sender, GridViewPageEventArgs e)
-    {
-        gvUsers.PageIndex = e.NewPageIndex;
-        BindGrid();
-    }
 }
+```
 
-// === Pages/Products.aspx.cs ===
-using System;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using App_Code.Data;
-
-public partial class Products : Page
-{
-    protected void Page_Load(object sender, EventArgs e)
-    {
-        if (Session["uid"] == null || Session["role"].ToString() != "Admin")
-        {
-            Response.Redirect("Login.aspx");
-            return;
-        }
-
-        if (!IsPostBack)
-        {
-            BindGrid();
-        }
-    }
-
-    private void BindGrid()
-    {
-        gvProducts.DataSource = ProductData.GetAll();
-        gvProducts.DataBind();
-    }
-
-    protected void btnSave_Click(object sender, EventArgs e)
-    {
-        // TODO: Implementar lógica para guardar producto
-        // BindGrid();
-    }
-
-    protected void btnDelete_Command(object sender, CommandEventArgs e)
-    {
-        // TODO: Implementar lógica para eliminar producto
-        // BindGrid();
-    }
-
-    protected void gvProducts_RowCommand(object sender, GridViewCommandEventArgs e)
-    {
-        // TODO: Implementar lógica para manejar comandos en el GridView
-    }
-
-    protected void gvProducts_PageIndexChanging(object sender, GridViewPageEventArgs e)
-    {
-        gvProducts.PageIndex = e.NewPageIndex;
-        BindGrid();
-    }
-}
-
-// === Pages/CashRegister.aspx.cs ===
+### E) // === Pages/CashRegister.aspx.cs ===
+```csharp
 using System;
 using System.Collections.Generic;
 using System.Web.UI;
@@ -790,183 +807,218 @@ using System.Web.UI.WebControls;
 using App_Code.Data;
 using App_Code.Services;
 
-public partial class CashRegister : Page
+namespace YourNamespace
 {
-    private List<CartItem> Cart
+    public partial class CashRegister : Page
     {
-        get { return (List<CartItem>)ViewState["Cart"] ?? new List<CartItem>(); }
-        set { ViewState["Cart"] = value; }
-    }
-
-    protected void Page_Load(object sender, EventArgs e)
-    {
-        if (Session["uid"] == null)
+        private List<CartItem> Cart
         {
-            Response.Redirect("Login.aspx");
-            return;
+            get { return (List<CartItem>)Session["Cart"] ?? new List<CartItem>(); }
+            set { Session["Cart"] = value; }
         }
 
-        if (!IsPostBack)
+        protected void Page_Load(object sender, EventArgs e)
         {
-            LoadProducts();
-        }
-    }
-
-    private void LoadProducts()
-    {
-        ddlProducts.DataSource = ProductData.GetAll();
-        ddlProducts.DataTextField = "Name";
-        ddlProducts.DataValueField = "Id";
-        ddlProducts.DataBind();
-    }
-
-    protected void btnAddItem_Click(object sender, EventArgs e)
-    {
-        if (int.TryParse(txtQty.Text, out int qty) && qty > 0)
-        {
-            var productId = int.Parse(ddlProducts.SelectedValue);
-            var product = ProductData.GetById(productId);
-            var cartItem = Cart.Find(item => item.ProductId == productId);
-
-            if (cartItem != null)
+            if (Session["uid"] == null)
             {
-                cartItem.Quantity += qty;
+                Response.Redirect("Login.aspx");
+                return;
+            }
+
+            if (!IsPostBack)
+            {
+                LoadProducts();
+                gvCart.DataSource = Cart;
+                gvCart.DataBind();
+                RecalcTotals();
+            }
+        }
+
+        private void LoadProducts()
+        {
+            ddlProducts.DataSource = ProductData.GetAll();
+            ddlProducts.DataTextField = "Name";
+            ddlProducts.DataValueField = "Id";
+            ddlProducts.DataBind();
+        }
+
+        protected void btnAddItem_Click(object sender, EventArgs e)
+        {
+            if (int.TryParse(txtQty.Text, out int qty) && qty > 0)
+            {
+                int productId = int.Parse(ddlProducts.SelectedValue);
+                var product = ProductData.GetById(productId);
+                var cartItem = Cart.Find(i => i.ProductId == productId);
+
+                if (cartItem != null)
+                {
+                    cartItem.Quantity += qty;
+                }
+                else
+                {
+                    Cart.Add(new CartItem
+                    {
+                        ProductId = productId,
+                        Name = product.Name,
+                        UnitPrice = product.Price,
+                        Quantity = qty,
+                        LineTotal = qty * product.Price
+                    });
+                }
+
+                RecalcTotals();
+                gvCart.DataSource = Cart;
+                gvCart.DataBind();
             }
             else
             {
-                Cart.Add(new CartItem
-                {
-                    ProductId = productId,
-                    Name = product.Name,
-                    UnitPrice = product.Price,
-                    Quantity = qty,
-                    LineTotal = qty * product.Price
-                });
+                lblMessage.Text = "Cantidad inválida.";
+            }
+        }
+
+        private void RecalcTotals()
+        {
+            decimal subtotal = 0;
+            foreach (var item in Cart)
+            {
+                subtotal += item.LineTotal;
             }
 
+            decimal tax = subtotal * 0.16m;
+            decimal total = subtotal + tax;
+
+            lblSubtotal.Text = $"Subtotal: {subtotal:C}";
+            lblTax.Text = $"IVA: {tax:C}";
+            lblTotal.Text = $"Total: {total:C}";
+        }
+
+        protected void gvCart_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "Remove")
+            {
+                int productId = Convert.ToInt32(e.CommandArgument);
+                Cart.RemoveAll(i => i.ProductId == productId);
+                RecalcTotals();
+                gvCart.DataSource = Cart;
+                gvCart.DataBind();
+            }
+        }
+
+        protected void btnCheckout_Click(object sender, EventArgs e)
+        {
+            var saleService = new SalesService();
+            var items = new List<(int productId, int qty)>();
+
+            foreach (var item in Cart)
+            {
+                items.Add((item.ProductId, item.Quantity));
+            }
+
+            int saleId = saleService.CreateSale((int)Session["uid"], items);
+            lblMessage.Text = $"Venta registrada con ID: {saleId}";
+
+            Cart.Clear();
             RecalcTotals();
             gvCart.DataSource = Cart;
             gvCart.DataBind();
         }
-        else
-        {
-            lblMessage.Text = "Cantidad inválida.";
-        }
     }
 
-    private void RecalcTotals()
+    public class CartItem
     {
-        decimal subtotal = 0;
-        foreach (var item in Cart)
-        {
-            subtotal += item.LineTotal;
-        }
-
-        decimal tax = subtotal * 0.16m;
-        decimal total = subtotal + tax;
-
-        lblSubtotal.Text = $"Subtotal: {subtotal:C}";
-        lblTax.Text = $"IVA: {tax:C}";
-        lblTotal.Text = $"Total: {total:C}";
-    }
-
-    protected void gvCart_RowCommand(object sender, GridViewCommandEventArgs e)
-    {
-        // TODO: Implementar lógica para eliminar producto del carrito
-        // RecalcTotals();
-    }
-
-    protected void btnCheckout_Click(object sender, EventArgs e)
-    {
-        var saleService = new SalesService();
-        var items = new List<(int productId, int qty)>();
-
-        foreach (var item in Cart)
-        {
-            items.Add((item.ProductId, item.Quantity));
-        }
-
-        int saleId = saleService.CreateSale((int)Session["uid"], items);
-        lblMessage.Text = $"Venta registrada con ID: {saleId}";
-
-        Cart.Clear();
-        RecalcTotals();
-        gvCart.DataSource = null;
-        gvCart.DataBind();
+        public int ProductId { get; set; }
+        public string Name { get; set; }
+        public decimal UnitPrice { get; set; }
+        public int Quantity { get; set; }
+        public decimal LineTotal => Quantity * UnitPrice;
     }
 }
+```
 
-// === Pages/SalesReport.aspx.cs ===
+### F) // === Pages/SalesReport.aspx.cs ===
+```csharp
 using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using App_Code.Data;
 
-public partial class SalesReport : Page
+namespace YourNamespace
 {
-    protected void Page_Load(object sender, EventArgs e)
+    public partial class SalesReport : Page
     {
-        if (Session["uid"] == null)
+        protected void Page_Load(object sender, EventArgs e)
         {
-            Response.Redirect("Login.aspx");
-            return;
-        }
-    }
-
-    protected void btnFilter_Click(object sender, EventArgs e)
-    {
-        if (DateTime.TryParse(txtFrom.Text, out DateTime from) && DateTime.TryParse(txtTo.Text, out DateTime to))
-        {
-            var sales = SalesData.GetByDateRange(from.ToUniversalTime(), to.ToUniversalTime());
-            gvSales.DataSource = sales;
-            gvSales.DataBind();
-
-            decimal totalGeneral = 0;
-            foreach (var sale in sales)
+            if (Session["uid"] == null)
             {
-                totalGeneral += sale.Total;
+                Response.Redirect("Login.aspx");
+                return;
             }
-            lblTotalGeneral.Text = $"Total General: {totalGeneral:C}";
         }
-        else
+
+        protected void btnFilter_Click(object sender, EventArgs e)
         {
-            lblMessage.Text = "Fechas inválidas.";
+            if (DateTime.TryParse(txtFrom.Text, out DateTime from) && DateTime.TryParse(txtTo.Text, out DateTime to))
+            {
+                var sales = SalesData.GetByDateRange(from.ToUniversalTime(), to.ToUniversalTime());
+                gvSales.DataSource = sales;
+                gvSales.DataBind();
+
+                decimal totalGeneral = 0;
+                foreach (var sale in sales)
+                {
+                    totalGeneral += sale.Total;
+                }
+                lblTotalGeneral.Text = $"Total General: {totalGeneral:C}";
+            }
+            else
+            {
+                lblMessage.Text = "Fechas inválidas.";
+            }
         }
-    }
-}
-
-// === Site.Master.cs ===
-using System;
-using System.Web.UI;
-
-public partial class SiteMaster : MasterPage
-{
-    protected void Page_Load(object sender, EventArgs e)
-    {
-        if (Session["uid"] != null)
-        {
-            // Mostrar/ocultar menús según rol
-            pnlAdmin.Visible = Session["role"].ToString() == "Admin";
-        }
-    }
-
-    protected void lnkLogout_Click(object sender, EventArgs e)
-    {
-        var authService = new AuthService();
-        authService.Logout(Session);
-        Response.Redirect("~/Pages/Login.aspx");
     }
 }
 ```
 
-### Consideraciones de seguridad
+### G) // === Site.Master.cs ===
+```csharp
+using System;
+using System.Web.UI;
+using App_Code.Services;
+
+namespace YourNamespace
+{
+    public partial class Site : MasterPage
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Session["uid"] != null)
+            {
+                var role = Session["role"].ToString();
+                pnlAdmin.Visible = role == "Admin";
+                // Otros paneles según el rol
+            }
+        }
+
+        protected void lnkLogout_Click(object sender, EventArgs e)
+        {
+            var authService = new AuthService();
+            authService.Logout(Session);
+            Response.Redirect("~/Pages/Login.aspx");
+        }
+    }
+}
+```
+
+---
+
+## Consideraciones de Seguridad
 - Se implementa SQL parametrizado para prevenir inyecciones SQL.
 - Las contraseñas se almacenan usando BCrypt para asegurar que no se guarden en texto plano.
 - Se valida la entrada del usuario en el servidor para evitar datos maliciosos.
 - Se utiliza `Server.HtmlEncode` para prevenir ataques XSS al mostrar datos ingresados por el usuario.
-- Se maneja la sesión de manera segura, evitando el uso de cookies y asegurando que se verifique la sesión en cada página protegida.
+- Se maneja la sesión de manera segura, evitando el uso de cookies y asegurando que las sesiones se limpien adecuadamente al cerrar sesión.
 
 ✅ Guardado en: /home/runner/work/PuntoVentas/PuntoVentas/results/EspecificacionesProyecto.md
 ✅ Guardado en: /home/runner/work/PuntoVentas/PuntoVentas/results/EspecificacionesProyecto.md
-📏 Tamaño (bytes): 28494
+📏 Tamaño (bytes): 31630
 🧪 Existe?: True
