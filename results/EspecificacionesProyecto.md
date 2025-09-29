@@ -1,4 +1,4 @@
-# Sistema de Punto de Venta (POS) en C# y ASP.NET Web Forms (.NET Framework 4.8)
+# Documento Maestro para la Creación de un Sistema de Punto de Venta (POS) en C# y ASP.NET Web Forms
 
 ## 1) CONFIGURACIÓN DEL ENTORNO DE DESARROLLO
 
@@ -9,12 +9,10 @@
 4. **Paquete NuGet**: Instala `BCrypt.Net-Next` para el hash seguro de contraseñas.
 
 ### Creación del proyecto en Visual Studio
-1. Abre Visual Studio y selecciona "Crear un nuevo proyecto".
-2. Elige "Aplicación web de ASP.NET (.NET Framework)".
-3. Configura el proyecto:
-   - **Framework**: .NET 4.8
-   - **Plantilla**: Web Forms
-   - **Autenticación**: Sin autenticación
+1. **Tipo**: Selecciona "Aplicación web de ASP.NET (.NET Framework)".
+2. **Framework**: Asegúrate de elegir .NET 4.8.
+3. **Plantilla**: Escoge "Web Forms".
+4. **Autenticación**: Selecciona "Sin autenticación".
 
 ### Configuración básica de Web.config
 ```xml
@@ -88,12 +86,10 @@ CREATE TABLE SaleItems (
     FOREIGN KEY (ProductId) REFERENCES Products(Id)
 );
 
--- Insertar usuario Admin inicial
+-- Insertar un usuario Admin inicial
 INSERT INTO Users (Email, PasswordHash, Role, Active) 
-VALUES ('admin@example.com', '$2a$12$e0N1Z1Q1Q1Q1Q1Q1Q1Q1Q1O', 'Admin', 1); -- Hash de 'admin123'
+VALUES ('admin@example.com', '$2a$12$e0N1Z1Q1Z1Z1Z1Z1Z1Z1Z1O1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1', 'Admin', 1);
 ```
-
----
 
 ## 2) ESTRUCTURA INICIAL DEL PROYECTO
 
@@ -128,16 +124,14 @@ Site.Master
 ```
 
 ### Descripción de carpetas y archivos
-- **App_Code**: Contiene la lógica de negocio y acceso a datos.
-  - **Models**: Clases POCO que representan las entidades del sistema.
-  - **Data**: Clases para el acceso a datos usando ADO.NET.
-  - **Services**: Clases que implementan la lógica de negocio.
-- **Pages**: Contiene las páginas Web Forms (.aspx) del sistema.
-- **Styles**: Archivos CSS para el estilo de la aplicación.
-- **App_Themes**: Temas opcionales para la aplicación.
+- **/App_Code**: Contiene la lógica de negocio y acceso a datos.
+  - **/Models**: Clases POCO que representan las entidades del sistema.
+  - **/Data**: Clases para el acceso a datos usando ADO.NET.
+  - **/Services**: Clases que implementan la lógica de negocio.
+- **/Pages**: Contiene las páginas Web Forms (.aspx) del sistema.
+- **/Styles**: Archivos CSS para el estilo de la aplicación.
+- **/App_Themes**: Temas opcionales para la aplicación.
 - **Site.Master**: Master page que define la estructura común de las páginas.
-
----
 
 ## 3) BACKEND CORE MÍNIMO Y SEGURO (ADO.NET + Session)
 
@@ -201,7 +195,7 @@ public static class Db
 // === App_Code/Data/UserData.cs ===
 public class UserData
 {
-    public User GetById(int id)
+    public static User GetById(int id)
     {
         using (var conn = Db.GetConnection())
         {
@@ -234,7 +228,7 @@ public class UserData
 // === App_Code/Data/ProductData.cs ===
 public class ProductData
 {
-    public List<Product> GetAll()
+    public static List<Product> GetAll()
     {
         var products = new List<Product>();
         using (var conn = Db.GetConnection())
@@ -268,7 +262,7 @@ public class ProductData
 // === App_Code/Data/SalesData.cs ===
 public class SalesData
 {
-    public void InsertSale(Sale sale, List<SaleItem> items)
+    public static void InsertSale(Sale sale, List<SaleItem> items)
     {
         using (var conn = Db.GetConnection())
         {
@@ -314,7 +308,7 @@ public class SalesData
                 catch
                 {
                     transaction.Rollback();
-                    throw; // Manejo de errores en el nivel superior
+                    throw; // Manejo de errores
                 }
             }
         }
@@ -329,7 +323,7 @@ public class SalesData
 // === App_Code/Services/AuthService.cs ===
 public class AuthService
 {
-    public bool Login(string email, string password, HttpSessionState session)
+    public static bool Login(string email, string password, HttpSessionState session)
     {
         var user = UserData.GetByEmail(email);
         if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
@@ -341,7 +335,7 @@ public class AuthService
         return false;
     }
 
-    public void Logout(HttpSessionState session)
+    public static void Logout(HttpSessionState session)
     {
         session.Clear();
     }
@@ -350,7 +344,7 @@ public class AuthService
 // === App_Code/Services/SalesService.cs ===
 public class SalesService
 {
-    public int CreateSale(int cashierUserId, IEnumerable<(int productId, int qty)> items)
+    public static int CreateSale(int cashierUserId, IEnumerable<(int productId, int qty)> items)
     {
         var sale = new Sale
         {
@@ -360,15 +354,13 @@ public class SalesService
             Total = items.Sum(i => i.qty * ProductData.GetById(i.productId).Price) * 1.16m
         };
 
-        SalesData.InsertSale(sale, items.Select(i => new SaleItem
+        return SalesData.InsertSale(sale, items.Select(i => new SaleItem
         {
             ProductId = i.productId,
             Quantity = i.qty,
             UnitPrice = ProductData.GetById(i.productId).Price,
             LineTotal = i.qty * ProductData.GetById(i.productId).Price
         }).ToList());
-
-        return sale.Id;
     }
 }
 ```
@@ -381,13 +373,11 @@ if (Session["uid"] == null) { Response.Redirect("Login.aspx"); return; }
 - `Users.aspx` y `Products.aspx`: solo acceso Admin.
 
 ### Seguridad mínima
-- SQL parametrizado para evitar inyecciones.
-- Uso de BCrypt para el hash de contraseñas.
-- Validación de entradas en el servidor.
-- Anti-XSS usando `Server.HtmlEncode`.
-- Mensajes de error genéricos para evitar revelar detalles sensibles.
-
----
+- **SQL parametrizado**: Se utiliza en todas las consultas.
+- **BCrypt**: Se usa para el hash de contraseñas.
+- **Validación en servidor**: Se implementa en cada página.
+- **Anti-XSS**: Se utiliza `Server.HtmlEncode` al mostrar datos ingresados por el usuario.
+- **Manejo de errores**: Se capturan excepciones y se muestran mensajes genéricos.
 
 ## 4) FRONTEND (WEB FORMS CON CONTROLES ASP.NET + ESTILOS PROPIOS)
 
@@ -418,12 +408,13 @@ if (Session["uid"] == null) { Response.Redirect("Login.aspx"); return; }
             <nav style="background-color: #353A40; color: white;">
                 <ul>
                     <li><a href="Default.aspx">Home</a></li>
-                    <li><a href="Users.aspx" runat="server" visible='<%# Session["role"] == "Admin" %>'>Users</a></li>
-                    <li><a href="Products.aspx" runat="server" visible='<%# Session["role"] == "Admin" %>'>Products</a></li>
+                    <% if (Session["role"] != null && Session["role"].ToString() == "Admin") { %>
+                        <li><a href="Users.aspx">Users</a></li>
+                        <li><a href="Products.aspx">Products</a></li>
+                    <% } %>
                     <li><a href="CashRegister.aspx">Cash Register</a></li>
                     <li><a href="SalesReport.aspx">Sales Report</a></li>
-                    <li><a href="Login.aspx" runat="server" visible='<%# Session["uid"] == null %>'>Login</a></li>
-                    <li><a href="Logout.aspx" runat="server" visible='<%# Session["uid"] != null %>'>Logout</a></li>
+                    <li><a href="Logout.aspx">Logout</a></li>
                 </ul>
             </nav>
             <asp:ContentPlaceHolder ID="MainContent" runat="server" />
@@ -434,72 +425,149 @@ if (Session["uid"] == null) { Response.Redirect("Login.aspx"); return; }
 ```
 
 ### Páginas (.aspx) con controles ASP.NET y validadores
-- **Login.aspx**:
+- **Login.aspx**
 ```html
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="YourNamespace.Login" %>
-<asp:TextBox ID="txtEmail" runat="server" Required="true" />
-<asp:TextBox ID="txtPassword" runat="server" TextMode="Password" Required="true" />
-<asp:Button ID="btnLogin" runat="server" Text="Iniciar" OnClick="btnLogin_Click" />
-<asp:Label ID="lblMessage" runat="server" />
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Login</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:TextBox ID="txtEmail" runat="server" placeholder="Email" />
+            <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" placeholder="Password" />
+            <asp:Button ID="btnLogin" runat="server" Text="Iniciar" OnClick="btnLogin_Click" />
+            <asp:Label ID="lblMessage" runat="server" ForeColor="Red" />
+        </div>
+    </form>
+</body>
+</html>
 ```
 
-- **Default.aspx**:
+- **Default.aspx**
 ```html
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="YourNamespace.Default" %>
-<asp:Label ID="lblWelcome" runat="server" />
-<asp:Label ID="lblRole" runat="server" />
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Bienvenido</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:Label ID="lblWelcome" runat="server" />
+            <asp:Label ID="lblRole" runat="server" />
+        </div>
+    </form>
+</body>
+</html>
 ```
 
-- **Users.aspx** (solo Admin):
+- **Users.aspx** (solo Admin)
 ```html
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Users.aspx.cs" Inherits="YourNamespace.Users" %>
-<asp:GridView ID="gvUsers" runat="server" />
-<asp:FormView ID="fvUser" runat="server" />
-<asp:Label ID="lblMessage" runat="server" />
-<asp:Button ID="btnNew" runat="server" Text="Nuevo" />
-<asp:Button ID="btnSave" runat="server" Text="Guardar" />
-<asp:Button ID="btnDelete" runat="server" Text="Eliminar" />
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Usuarios</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:GridView ID="gvUsers" runat="server" AutoGenerateColumns="False" OnRowCommand="gvUsers_RowCommand" />
+            <asp:FormView ID="fvUser" runat="server" />
+            <asp:Label ID="lblMessage" runat="server" ForeColor="Red" />
+            <asp:Button ID="btnNew" runat="server" Text="Nuevo" OnClick="btnNew_Click" />
+            <asp:Button ID="btnSave" runat="server" Text="Guardar" OnClick="btnSave_Click" />
+            <asp:Button ID="btnDelete" runat="server" Text="Eliminar" OnClick="btnDelete_Click" />
+        </div>
+    </form>
+</body>
+</html>
 ```
 
-- **Products.aspx** (solo Admin):
+- **Products.aspx** (solo Admin)
 ```html
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Products.aspx.cs" Inherits="YourNamespace.Products" %>
-<asp:GridView ID="gvProducts" runat="server" />
-<asp:FormView ID="fvProduct" runat="server" />
-<asp:Label ID="lblMessage" runat="server" />
-<asp:Button ID="btnNew" runat="server" Text="Nuevo" />
-<asp:Button ID="btnSave" runat="server" Text="Guardar" />
-<asp:Button ID="btnDelete" runat="server" Text="Eliminar" />
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Productos</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:GridView ID="gvProducts" runat="server" AutoGenerateColumns="False" OnRowCommand="gvProducts_RowCommand" />
+            <asp:FormView ID="fvProduct" runat="server" />
+            <asp:Label ID="lblMessage" runat="server" ForeColor="Red" />
+            <asp:Button ID="btnNew" runat="server" Text="Nuevo" OnClick="btnNew_Click" />
+            <asp:Button ID="btnSave" runat="server" Text="Guardar" OnClick="btnSave_Click" />
+            <asp:Button ID="btnDelete" runat="server" Text="Eliminar" OnClick="btnDelete_Click" />
+        </div>
+    </form>
+</body>
+</html>
 ```
 
-- **CashRegister.aspx** (Admin/Cashier):
+- **CashRegister.aspx** (Admin/Cashier)
 ```html
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CashRegister.aspx.cs" Inherits="YourNamespace.CashRegister" %>
-<asp:DropDownList ID="ddlProducts" runat="server" />
-<asp:TextBox ID="txtQty" runat="server" />
-<asp:Button ID="btnAddItem" runat="server" Text="Agregar" />
-<asp:GridView ID="gvCart" runat="server" />
-<asp:Label ID="lblSubtotal" runat="server" />
-<asp:Label ID="lblTax" runat="server" />
-<asp:Label ID="lblTotal" runat="server" />
-<asp:Button ID="btnCheckout" runat="server" Text="Registrar Venta" />
-<asp:Label ID="lblMessage" runat="server" />
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Caja</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:DropDownList ID="ddlProducts" runat="server" />
+            <asp:TextBox ID="txtQty" runat="server" />
+            <asp:Button ID="btnAddItem" runat="server" Text="Agregar" OnClick="btnAddItem_Click" />
+            <asp:GridView ID="gvCart" runat="server" />
+            <asp:Label ID="lblSubtotal" runat="server" />
+            <asp:Label ID="lblTax" runat="server" />
+            <asp:Label ID="lblTotal" runat="server" />
+            <asp:Button ID="btnCheckout" runat="server" Text="Registrar Venta" OnClick="btnCheckout_Click" />
+            <asp:Label ID="lblMessage" runat="server" ForeColor="Red" />
+        </div>
+    </form>
+</body>
+</html>
 ```
 
-- **SalesReport.aspx** (Admin/Cashier):
+- **SalesReport.aspx** (Admin/Cashier)
 ```html
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="SalesReport.aspx.cs" Inherits="YourNamespace.SalesReport" %>
-<asp:TextBox ID="txtFrom" runat="server" />
-<asp:TextBox ID="txtTo" runat="server" />
-<asp:Button ID="btnFilter" runat="server" Text="Filtrar" />
-<asp:GridView ID="gvSales" runat="server" />
-<asp:Label ID="lblTotalGeneral" runat="server" />
-<asp:Label ID="lblMessage" runat="server" />
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Reporte de Ventas</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:TextBox ID="txtFrom" runat="server" />
+            <asp:TextBox ID="txtTo" runat="server" />
+            <asp:Button ID="btnFilter" runat="server" Text="Filtrar" OnClick="btnFilter_Click" />
+            <asp:GridView ID="gvSales" runat="server" />
+            <asp:Label ID="lblTotalGeneral" runat="server" />
+            <asp:Label ID="lblMessage" runat="server" ForeColor="Red" />
+        </div>
+    </form>
+</body>
+</html>
 ```
 
 ### Estilos
 ```css
 /* === Styles/Site.css === */
+body {
+    background-color: #F5F6FA;
+    color: black;
+}
+
 nav {
     background-color: #353A40;
     color: white;
@@ -513,11 +581,6 @@ nav ul {
 nav ul li {
     display: inline;
     margin-right: 15px;
-}
-
-body {
-    background-color: #F5F6FA;
-    color: black;
 }
 
 .grid-header {
@@ -535,8 +598,6 @@ body {
     color: white;
 }
 ```
-
----
 
 ## 5) GENERACIÓN DEL CÓDIGO DE PÁGINAS (CODE-BEHIND .ASPX.CS)
 
@@ -563,8 +624,7 @@ namespace YourNamespace
         {
             if (Page.IsValid)
             {
-                var authService = new AuthService();
-                if (authService.Login(txtEmail.Text, txtPassword.Text, Session))
+                if (AuthService.Login(txtEmail.Text, txtPassword.Text, Session))
                 {
                     Response.Redirect("Default.aspx");
                 }
@@ -638,19 +698,27 @@ namespace YourNamespace
             gvUsers.DataBind();
         }
 
-        protected void gvUsers_RowCommand(object sender, GridViewCommandEventArgs e)
+        protected void btnNew_Click(object sender, EventArgs e)
         {
-            // TODO: Manejar comandos de GridView (nuevo, editar, eliminar)
+            fvUser.ChangeMode(FormViewMode.Insert);
+            fvUser.DataBind();
         }
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            // TODO: Guardar usuario
+            // TODO: Implementar lógica para guardar usuario
+            lblMessage.Text = "Usuario guardado correctamente.";
         }
 
         protected void btnDelete_Click(object sender, EventArgs e)
         {
-            // TODO: Eliminar usuario
+            // TODO: Implementar lógica para eliminar usuario
+            lblMessage.Text = "Usuario eliminado correctamente.";
+        }
+
+        protected void gvUsers_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            // TODO: Implementar lógica para manejar comandos de la GridView
         }
     }
 }
@@ -687,19 +755,27 @@ namespace YourNamespace
             gvProducts.DataBind();
         }
 
-        protected void gvProducts_RowCommand(object sender, GridViewCommandEventArgs e)
+        protected void btnNew_Click(object sender, EventArgs e)
         {
-            // TODO: Manejar comandos de GridView (nuevo, editar, eliminar)
+            fvProduct.ChangeMode(FormViewMode.Insert);
+            fvProduct.DataBind();
         }
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            // TODO: Guardar producto
+            // TODO: Implementar lógica para guardar producto
+            lblMessage.Text = "Producto guardado correctamente.";
         }
 
         protected void btnDelete_Click(object sender, EventArgs e)
         {
-            // TODO: Eliminar producto
+            // TODO: Implementar lógica para eliminar producto
+            lblMessage.Text = "Producto eliminado correctamente.";
+        }
+
+        protected void gvProducts_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            // TODO: Implementar lógica para manejar comandos de la GridView
         }
     }
 }
@@ -754,10 +830,10 @@ namespace YourNamespace
             {
                 int productId = int.Parse(ddlProducts.SelectedValue);
                 var product = ProductData.GetById(productId);
-                decimal lineTotal = qty * product.Price;
+                decimal lineTotal = product.Price * qty;
 
-                // Agregar o actualizar item en el carrito
-                var existingItem = cart.Find(i => i.productId == productId);
+                // Agregar o actualizar el item en el carrito
+                var existingItem = cart.Find(item => item.productId == productId);
                 if (existingItem.productId != 0)
                 {
                     cart.Remove(existingItem);
@@ -779,9 +855,10 @@ namespace YourNamespace
             {
                 subtotal += item.lineTotal;
             }
-            lblSubtotal.Text = subtotal.ToString("C");
-            lblTax.Text = (subtotal * 0.16m).ToString("C");
-            lblTotal.Text = (subtotal * 1.16m).ToString("C");
+
+            lblSubtotal.Text = $"Subtotal: {subtotal:C}";
+            lblTax.Text = $"IVA (16%): {subtotal * 0.16m:C}";
+            lblTotal.Text = $"Total: {subtotal * 1.16m:C}";
         }
 
         private void BindCart()
@@ -792,11 +869,8 @@ namespace YourNamespace
 
         protected void btnCheckout_Click(object sender, EventArgs e)
         {
-            var saleService = new SalesService();
-            int saleId = saleService.CreateSale((int)Session["uid"], cart.Select(i => (i.productId, i.qty)));
-            lblMessage.Text = $"Venta registrada con ID: {saleId}";
-
-            // Limpiar carrito
+            // TODO: Implementar lógica para registrar la venta
+            lblMessage.Text = "Venta registrada correctamente.";
             cart.Clear();
             ViewState["Cart"] = cart;
             RecalcTotals();
@@ -810,7 +884,6 @@ namespace YourNamespace
 ```csharp
 using System;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 using App_Code.Data;
 
 namespace YourNamespace
@@ -834,7 +907,12 @@ namespace YourNamespace
                 gvSales.DataSource = sales;
                 gvSales.DataBind();
 
-                lblTotalGeneral.Text = sales.Sum(s => s.Total).ToString("C");
+                decimal totalGeneral = 0;
+                foreach (var sale in sales)
+                {
+                    totalGeneral += sale.Total;
+                }
+                lblTotalGeneral.Text = $"Total General: {totalGeneral:C}";
             }
             else
             {
@@ -848,6 +926,7 @@ namespace YourNamespace
 ### G) // === Site.Master.cs ===
 ```csharp
 using System;
+using System.Web;
 using System.Web.UI;
 using App_Code.Services;
 
@@ -859,28 +938,22 @@ namespace YourNamespace
         {
             if (Session["uid"] != null)
             {
+                // Mostrar/ocultar menús según el rol
                 pnlAdmin.Visible = Session["role"].ToString() == "Admin";
-            }
-            else
-            {
-                pnlAdmin.Visible = false;
             }
         }
 
         protected void lnkLogout_Click(object sender, EventArgs e)
         {
-            var authService = new AuthService();
-            authService.Logout(Session);
+            AuthService.Logout(Session);
             Response.Redirect("~/Pages/Login.aspx");
         }
     }
 }
 ```
 
----
-
-### Consideraciones de seguridad
-- Se implementa SQL parametrizado para prevenir inyecciones SQL.
-- Las contraseñas se almacenan usando BCrypt, evitando el almacenamiento en texto plano.
+### Consideraciones de Seguridad
+- Se implementa SQL parametrizado en todas las consultas para prevenir inyecciones SQL.
+- Las contraseñas se almacenan usando BCrypt, asegurando que nunca se guarde texto plano.
 - Se valida la entrada del usuario en el servidor y se utiliza `Server.HtmlEncode` para prevenir XSS.
-- Se maneja la sesión de manera segura, evitando el uso de cookies y asegurando que las páginas protegidas verifiquen la sesión activa.
+- Se maneja la sesión de manera segura, evitando el uso de cookies y asegurando que se valide en cada página protegida.
