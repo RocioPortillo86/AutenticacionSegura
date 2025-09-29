@@ -24,12 +24,12 @@ Aquí tienes instrucciones claras y concisas para configurar el entorno de desar
 2. **Configurar el proyecto**:
    - Asigna un nombre a tu proyecto (por ejemplo, `PuntoDeVenta`).
    - Selecciona la ubicación donde deseas guardar el proyecto.
-   - Asegúrate de que la opción "Crear una solución en un nuevo directorio" esté marcada.
+   - Asegúrate de que la opción "Crear una solución nueva" esté seleccionada.
    - Haz clic en "Crear".
 
 3. **Seleccionar plantilla de proyecto**:
-   - En la ventana "Crear una nueva aplicación web", selecciona "Aplicación Web (Modelo-Vista-Controlador)".
-   - Asegúrate de que la opción "Autenticación" esté configurada en "Cuentas de usuario individuales".
+   - En la ventana "Crear una nueva aplicación web", selecciona "Aplicación Web" (no seleccionas MVC).
+   - Asegúrate de que la opción "Autenticación" esté configurada como "Cuentas de usuario individuales".
    - Haz clic en "Crear".
 
 ### Configuración de la Cadena de Conexión a SQL Server
@@ -38,11 +38,11 @@ Aquí tienes instrucciones claras y concisas para configurar el entorno de desar
    - En el Explorador de soluciones, busca el archivo `web.config` en la raíz del proyecto y ábrelo.
 
 2. **Agregar la cadena de conexión**:
-   - Dentro de la sección `<configuration>`, busca la sección `<connectionStrings>`. Si no existe, agrégala. Debería verse así:
+   - Dentro de la sección `<configuration>`, busca la sección `<connectionStrings>` (si no existe, créala) y agrega la siguiente cadena de conexión:
 
    ```xml
    <connectionStrings>
-       <add name="DefaultConnection" 
+       <add name="PuntoDeVentaDB" 
             connectionString="Server=TU_SERVIDOR;Database=TU_BASE_DE_DATOS;User Id=TU_USUARIO;Password=TU_CONTRASEÑA;" 
             providerName="System.Data.SqlClient" />
    </connectionStrings>
@@ -71,8 +71,7 @@ Aquí tienes instrucciones claras y concisas para configurar el entorno de desar
 
 ### Notas Finales
 
-- Asegúrate de que tu SQL Server esté configurado para permitir conexiones remotas si es necesario.
+- Asegúrate de que tu SQL Server esté configurado para permitir conexiones remotas si estás utilizando un servidor diferente.
 - Considera crear la base de datos y las tablas necesarias para tu aplicación utilizando SQL Server Management Studio.
-- Recuerda que la seguridad es fundamental, así que asegúrate de manejar adecuadamente las credenciales y la configuración de la base de datos.
 
 Con estos pasos, deberías estar listo para comenzar a desarrollar tu sistema de Punto de Venta en ASP.NET Web Forms.
