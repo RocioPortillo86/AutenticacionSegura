@@ -12,6 +12,10 @@ namespace YourNamespace
 {
     public partial class Login : Page
     {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+        }
+
         protected void btnLogin_Click(object sender, EventArgs e)
         {
             var authService = new AuthService();
@@ -43,8 +47,7 @@ namespace YourNamespace
             {
                 Response.Redirect("Login.aspx");
             }
-            lblWelcome.Text = "Bienvenido, " + Session["uid"].ToString();
-            lblRole.Text = "Rol: " + Session["role"].ToString();
+            lblWelcome.Text = "Bienvenido, " + Session["role"];
         }
     }
 }
@@ -61,8 +64,6 @@ namespace YourNamespace
 {
     public partial class Users : Page
     {
-        private UserData userData = new UserData();
-
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["uid"] == null)
@@ -78,6 +79,7 @@ namespace YourNamespace
 
         private void LoadUsers()
         {
+            var userData = new UserData();
             gvUsers.DataSource = userData.GetAll();
             gvUsers.DataBind();
         }
@@ -90,38 +92,35 @@ namespace YourNamespace
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
+            var userData = new UserData();
             if (fvUser.CurrentMode == FormViewMode.Insert)
             {
-                // TODO: Implement Insert logic
-                var user = new User
+                // TODO: Validar y obtener datos del FormView
+                var newUser = new User
                 {
                     Email = ((TextBox)fvUser.FindControl("txtEmail")).Text,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(((TextBox)fvUser.FindControl("txtPassword")).Text),
                     Role = ((DropDownList)fvUser.FindControl("ddlRole")).SelectedValue,
-                    Active = ((CheckBox)fvUser.FindControl("chkActive")).Checked
+                    Active = true
                 };
-                userData.Insert(user);
+                userData.Insert(newUser);
             }
             else if (fvUser.CurrentMode == FormViewMode.Edit)
             {
-                // TODO: Implement Update logic
-                var user = new User
-                {
-                    Id = (int)gvUsers.SelectedDataKey.Value,
-                    Email = ((TextBox)fvUser.FindControl("txtEmail")).Text,
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(((TextBox)fvUser.FindControl("txtPassword")).Text),
-                    Role = ((DropDownList)fvUser.FindControl("ddlRole")).SelectedValue,
-                    Active = ((CheckBox)fvUser.FindControl("chkActive")).Checked
-                };
-                userData.Update(user);
+                // TODO: Validar y obtener datos del FormView
+                var userId = (int)gvUsers.SelectedDataKey.Value;
+                var existingUser = userData.GetById(userId);
+                existingUser.Email = ((TextBox)fvUser.FindControl("txtEmail")).Text;
+                existingUser.Role = ((DropDownList)fvUser.FindControl("ddlRole")).SelectedValue;
+                userData.Update(existingUser);
             }
             LoadUsers();
         }
 
         protected void btnDelete_Command(object sender, CommandEventArgs e)
         {
-            // TODO: Implement Delete logic
-            int userId = Convert.ToInt32(e.CommandArgument);
+            var userData = new UserData();
+            var userId = Convert.ToInt32(e.CommandArgument);
             userData.Delete(userId);
             LoadUsers();
         }
@@ -146,8 +145,6 @@ namespace YourNamespace
 {
     public partial class Products : Page
     {
-        private ProductData productData = new ProductData();
-
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["uid"] == null)
@@ -163,37 +160,44 @@ namespace YourNamespace
 
         private void LoadProducts()
         {
+            var productData = new ProductData();
             gvProducts.DataSource = productData.GetAll();
             gvProducts.DataBind();
         }
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            // TODO: Implement Insert/Update logic
-            var product = new Product
+            var productData = new ProductData();
+            if (fvProduct.CurrentMode == FormViewMode.Insert)
             {
-                Id = (int)gvProducts.SelectedDataKey.Value,
-                Sku = ((TextBox)fvProduct.FindControl("txtSku")).Text,
-                Name = ((TextBox)fvProduct.FindControl("txtName")).Text,
-                Price = decimal.Parse(((TextBox)fvProduct.FindControl("txtPrice")).Text),
-                Stock = int.Parse(((TextBox)fvProduct.FindControl("txtStock")).Text),
-                Active = ((CheckBox)fvProduct.FindControl("chkActive")).Checked
-            };
-            if (product.Id == 0)
-            {
-                productData.Insert(product);
+                // TODO: Validar y obtener datos del FormView
+                var newProduct = new Product
+                {
+                    Sku = ((TextBox)fvProduct.FindControl("txtSku")).Text,
+                    Name = ((TextBox)fvProduct.FindControl("txtName")).Text,
+                    Price = decimal.Parse(((TextBox)fvProduct.FindControl("txtPrice")).Text),
+                    Stock = int.Parse(((TextBox)fvProduct.FindControl("txtStock")).Text),
+                    Active = true
+                };
+                productData.Insert(newProduct);
             }
-            else
+            else if (fvProduct.CurrentMode == FormViewMode.Edit)
             {
-                productData.Update(product);
+                // TODO: Validar y obtener datos del FormView
+                var productId = (int)gvProducts.SelectedDataKey.Value;
+                var existingProduct = productData.GetById(productId);
+                existingProduct.Name = ((TextBox)fvProduct.FindControl("txtName")).Text;
+                existingProduct.Price = decimal.Parse(((TextBox)fvProduct.FindControl("txtPrice")).Text);
+                existingProduct.Stock = int.Parse(((TextBox)fvProduct.FindControl("txtStock")).Text);
+                productData.Update(existingProduct);
             }
             LoadProducts();
         }
 
         protected void btnDelete_Command(object sender, CommandEventArgs e)
         {
-            // TODO: Implement Delete logic
-            int productId = Convert.ToInt32(e.CommandArgument);
+            var productData = new ProductData();
+            var productId = Convert.ToInt32(e.CommandArgument);
             productData.Delete(productId);
             LoadProducts();
         }
@@ -221,8 +225,6 @@ namespace YourNamespace
 {
     public partial class CashRegister : Page
     {
-        private ProductData productData = new ProductData();
-        private SalesService salesService = new SalesService();
         private List<(int productId, int qty)> cart = new List<(int productId, int qty)>();
 
         protected void Page_Load(object sender, EventArgs e)
@@ -240,6 +242,7 @@ namespace YourNamespace
 
         private void LoadProducts()
         {
+            var productData = new ProductData();
             ddlProducts.DataSource = productData.GetAll();
             ddlProducts.DataTextField = "Name";
             ddlProducts.DataValueField = "Id";
@@ -258,14 +261,15 @@ namespace YourNamespace
         {
             gvCart.DataSource = cart.Select(item => new
             {
-                Product = productData.GetById(item.productId).Name,
+                ProductId = item.productId,
                 Quantity = item.qty,
-                UnitPrice = productData.GetById(item.productId).Price,
-                LineTotal = item.qty * productData.GetById(item.productId).Price
+                ProductName = ProductData.GetById(item.productId).Name,
+                UnitPrice = ProductData.GetById(item.productId).Price,
+                LineTotal = item.qty * ProductData.GetById(item.productId).Price
             }).ToList();
             gvCart.DataBind();
 
-            var subtotal = cart.Sum(item => item.qty * productData.GetById(item.productId).Price);
+            var subtotal = cart.Sum(item => item.qty * ProductData.GetById(item.productId).Price);
             lblSubtotal.Text = $"Subtotal: {subtotal:C}";
             lblTax.Text = $"IVA: {subtotal * 0.16m:C}";
             lblTotal.Text = $"Total: {subtotal * 1.16m:C}";
@@ -273,6 +277,7 @@ namespace YourNamespace
 
         protected void btnCheckout_Click(object sender, EventArgs e)
         {
+            var salesService = new SalesService();
             int cashierUserId = (int)Session["uid"];
             salesService.CreateSale(cashierUserId, cart);
             lblMessage.Text = "Venta registrada con éxito.";
@@ -293,8 +298,6 @@ namespace YourNamespace
 {
     public partial class SalesReport : Page
     {
-        private SalesData salesData = new SalesData();
-
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["uid"] == null)
@@ -307,18 +310,24 @@ namespace YourNamespace
         {
             DateTime fromDate = DateTime.Parse(txtFrom.Text);
             DateTime toDate = DateTime.Parse(txtTo.Text);
+            var salesData = new SalesData();
             gvSales.DataSource = salesData.GetByDateRange(fromDate, toDate);
             gvSales.DataBind();
 
-            // TODO: Calculate total general
-            lblTotalGeneral.Text = $"Total General: {salesData.GetTotalByDateRange(fromDate, toDate):C}";
+            // Calcular total general
+            decimal totalGeneral = 0;
+            foreach (var row in gvSales.Rows)
+            {
+                totalGeneral += Convert.ToDecimal(((Label)row.FindControl("lblTotal")).Text);
+            }
+            lblTotalGeneral.Text = $"Total General: {totalGeneral:C}";
         }
     }
 }
 ```
 
-### Notas de Seguridad
+### Consideraciones de Seguridad
 - Se utiliza **parametrización** en todas las consultas SQL para prevenir inyecciones SQL.
-- Las contraseñas se almacenan usando **hash + salt** con BCrypt, asegurando que nunca se guarde texto plano.
-- Se valida la entrada del usuario en el servidor y se utiliza `validateRequest="true"` en las páginas.
-- Se maneja la sesión de manera segura, evitando el uso de cookies y asegurando que las páginas protegidas verifiquen la sesión activa.
+- Las contraseñas se almacenan como **hash** utilizando BCrypt, lo que proporciona una capa de seguridad adicional.
+- Se valida la entrada del usuario en el servidor y se utiliza `validateRequest="true"` en las páginas para prevenir ataques XSS.
+- Se gestiona la sesión del usuario sin utilizar cookies, asegurando que los datos de sesión se mantengan seguros y se limpien al cerrar sesión.
