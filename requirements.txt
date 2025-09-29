@@ -14,3 +14,4 @@ numpy
 python-docx
 unstructured[standard]
 python-magic
+matplotlib
