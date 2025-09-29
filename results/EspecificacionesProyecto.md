@@ -1,4 +1,4 @@
-# Sistema de Punto de Venta (POS) en C# y ASP.NET Web Forms (.NET Framework 4.8)
+# Sistema de Punto de Venta (POS) en C# y ASP.NET Web Forms
 
 ## 1) CONFIGURACIÓN DEL ENTORNO DE DESARROLLO
 
@@ -9,12 +9,10 @@
 4. **Paquete NuGet**: Instala `BCrypt.Net-Next` para el hash seguro de contraseñas.
 
 ### Creación del proyecto en Visual Studio
-1. Abre Visual Studio y selecciona "Crear un nuevo proyecto".
-2. Elige "Aplicación web de ASP.NET (.NET Framework)".
-3. Configura el proyecto:
-   - **Framework**: .NET 4.8
-   - **Plantilla**: Web Forms
-   - **Autenticación**: Sin autenticación
+1. **Tipo**: Selecciona "Aplicación web de ASP.NET (.NET Framework)".
+2. **Framework**: Asegúrate de seleccionar .NET 4.8.
+3. **Plantilla**: Escoge "Web Forms".
+4. **Autenticación**: Selecciona "Sin autenticación".
 
 ### Configuración básica de Web.config
 ```xml
@@ -31,13 +29,17 @@
 **Nota**: Asegúrate de usar HTTPS en desarrollo y producción.
 
 ### Base de datos
-Las tablas principales son:
+#### Tablas principales
 - **Users**: Almacena información de los usuarios.
+  - Campos: Id (PK), Email (UN), PasswordHash, Role, Active.
 - **Products**: Almacena información de los productos.
-- **Sales**: Registra las ventas realizadas.
-- **SaleItems**: Detalla los productos vendidos en cada venta.
+  - Campos: Id (PK), Sku (UN), Name, Price, Stock, Active.
+- **Sales**: Almacena información de las ventas.
+  - Campos: Id (PK), CreatedAtUtc, CashierUserId (FK), Subtotal, Tax, Total.
+- **SaleItems**: Almacena los ítems de cada venta.
+  - Campos: Id (PK), SaleId (FK), ProductId (FK), Quantity, UnitPrice, LineTotal.
 
-### SCRIPT SQL COMPLETO Y EJECUTABLE
+#### SCRIPT SQL COMPLETO Y EJECUTABLE
 ```sql
 -- Crear la base de datos
 CREATE DATABASE POS_DB;
@@ -48,7 +50,7 @@ GO
 
 -- Crear tabla Users
 CREATE TABLE Users (
-    Id INT PRIMARY KEY IDENTITY(1,1),
+    Id INT IDENTITY(1,1) PRIMARY KEY,
     Email NVARCHAR(255) UNIQUE NOT NULL,
     PasswordHash NVARCHAR(255) NOT NULL,
     Role NVARCHAR(50) NOT NULL,
@@ -57,7 +59,7 @@ CREATE TABLE Users (
 
 -- Crear tabla Products
 CREATE TABLE Products (
-    Id INT PRIMARY KEY IDENTITY(1,1),
+    Id INT IDENTITY(1,1) PRIMARY KEY,
     Sku NVARCHAR(50) UNIQUE NOT NULL,
     Name NVARCHAR(255) NOT NULL,
     Price DECIMAL(18, 2) NOT NULL,
@@ -67,7 +69,7 @@ CREATE TABLE Products (
 
 -- Crear tabla Sales
 CREATE TABLE Sales (
-    Id INT PRIMARY KEY IDENTITY(1,1),
+    Id INT IDENTITY(1,1) PRIMARY KEY,
     CreatedAtUtc DATETIME NOT NULL DEFAULT GETDATE(),
     CashierUserId INT NOT NULL,
     Subtotal DECIMAL(18, 2) NOT NULL,
@@ -78,7 +80,7 @@ CREATE TABLE Sales (
 
 -- Crear tabla SaleItems
 CREATE TABLE SaleItems (
-    Id INT PRIMARY KEY IDENTITY(1,1),
+    Id INT IDENTITY(1,1) PRIMARY KEY,
     SaleId INT NOT NULL,
     ProductId INT NOT NULL,
     Quantity INT NOT NULL,
@@ -88,13 +90,10 @@ CREATE TABLE SaleItems (
     FOREIGN KEY (ProductId) REFERENCES Products(Id)
 );
 
--- Insertar un usuario Admin inicial
+-- Insertar usuario Admin inicial
 INSERT INTO Users (Email, PasswordHash, Role, Active) 
-VALUES ('admin@example.com', '$2a$12$e0N1Z1Q1Z1Z1Z1Z1Z1Z1Z1O1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1', 'Admin', 1);
+VALUES ('admin@example.com', '$2a$12$e0N1Z1Z1Z1Z1Z1Z1Z1Z1Z1u1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1', 'Admin', 1);
 ```
-**Nota**: El valor de `PasswordHash` es un hash de ejemplo generado con BCrypt.
-
----
 
 ## 2) ESTRUCTURA INICIAL DEL PROYECTO
 
@@ -128,22 +127,21 @@ VALUES ('admin@example.com', '$2a$12$e0N1Z1Q1Z1Z1Z1Z1Z1Z1Z1O1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z
 Site.Master
 ```
 
-### Descripción de carpetas y archivos
+### Descripción de carpetas/archivos
 - **App_Code**: Contiene la lógica de negocio y acceso a datos.
-  - **Models**: Clases que representan las entidades del sistema (User, Product, Sale, SaleItem).
-  - **Data**: Clases para el acceso a datos (Db, UserData, ProductData, SalesData).
-  - **Services**: Clases que implementan la lógica de negocio (AuthService, SalesService).
-- **Pages**: Contiene las páginas Web Forms del sistema.
+  - **Models**: Clases POCO que representan las entidades del sistema.
+  - **Data**: Clases para el acceso a datos utilizando ADO.NET.
+  - **Services**: Clases que implementan la lógica de negocio.
+- **Pages**: Contiene las páginas Web Forms (.aspx) del sistema.
 - **Styles**: Archivos CSS para el estilo de la aplicación.
 - **App_Themes**: Temas opcionales para la aplicación.
-- **Site.Master**: Master page que define la estructura común de las páginas.
-
----
+- **Site.Master**: Contenedor maestro que incluye el menú de navegación.
 
 ## 3) BACKEND CORE MÍNIMO Y SEGURO (ADO.NET + Session)
 
 ### Modelos (POCOs) en App_Code/Models
 ```csharp
+// === User.cs ===
 public class User
 {
     public int Id { get; set; }
@@ -153,6 +151,7 @@ public class User
     public bool Active { get; set; }
 }
 
+// === Product.cs ===
 public class Product
 {
     public int Id { get; set; }
@@ -163,6 +162,7 @@ public class Product
     public bool Active { get; set; }
 }
 
+// === Sale.cs ===
 public class Sale
 {
     public int Id { get; set; }
@@ -173,6 +173,7 @@ public class Sale
     public decimal Total { get; set; }
 }
 
+// === SaleItem.cs ===
 public class SaleItem
 {
     public int Id { get; set; }
@@ -185,8 +186,8 @@ public class SaleItem
 ```
 
 ### Acceso a datos (ADO.NET) en App_Code/Data
-#### Db.cs
 ```csharp
+// === Db.cs ===
 public static class Db
 {
     public static SqlConnection GetConnection()
@@ -194,89 +195,110 @@ public static class Db
         return new SqlConnection(ConfigurationManager.ConnectionStrings["POS_DB"].ConnectionString);
     }
 }
-```
 
-#### UserData.cs
-```csharp
+// === UserData.cs ===
 public class UserData
 {
     public User GetUserByEmail(string email)
     {
-        using (var connection = Db.GetConnection())
+        using (var conn = Db.GetConnection())
         {
-            var command = new SqlCommand("SELECT Id, Email, PasswordHash, Role, Active FROM Users WHERE Email = @Email", connection);
-            command.Parameters.AddWithValue("@Email", email);
-            connection.Open();
-            using (var reader = command.ExecuteReader())
+            conn.Open();
+            using (var cmd = new SqlCommand("SELECT Id, Email, PasswordHash, Role, Active FROM Users WHERE Email = @Email", conn))
             {
-                if (reader.Read())
+                cmd.Parameters.AddWithValue("@Email", email);
+                using (var reader = cmd.ExecuteReader())
                 {
-                    return new User
+                    if (reader.Read())
                     {
-                        Id = (int)reader["Id"],
-                        Email = (string)reader["Email"],
-                        PasswordHash = (string)reader["PasswordHash"],
-                        Role = (string)reader["Role"],
-                        Active = (bool)reader["Active"]
-                    };
+                        return new User
+                        {
+                            Id = (int)reader["Id"],
+                            Email = (string)reader["Email"],
+                            PasswordHash = (string)reader["PasswordHash"],
+                            Role = (string)reader["Role"],
+                            Active = (bool)reader["Active"]
+                        };
+                    }
                 }
             }
         }
         return null;
     }
-}
-```
 
-#### ProductData.cs
-```csharp
+    // TODO: Métodos para Insertar, Actualizar y Eliminar usuarios
+}
+
+// === ProductData.cs ===
 public class ProductData
 {
-    public void AddProduct(Product product)
+    public List<Product> GetAllProducts()
     {
-        using (var connection = Db.GetConnection())
+        var products = new List<Product>();
+        using (var conn = Db.GetConnection())
         {
-            var command = new SqlCommand("INSERT INTO Products (Sku, Name, Price, Stock, Active) VALUES (@Sku, @Name, @Price, @Stock, @Active)", connection);
-            command.Parameters.AddWithValue("@Sku", product.Sku);
-            command.Parameters.AddWithValue("@Name", product.Name);
-            command.Parameters.AddWithValue("@Price", product.Price);
-            command.Parameters.AddWithValue("@Stock", product.Stock);
-            command.Parameters.AddWithValue("@Active", product.Active);
-            connection.Open();
-            command.ExecuteNonQuery();
+            conn.Open();
+            using (var cmd = new SqlCommand("SELECT Id, Sku, Name, Price, Stock, Active FROM Products", conn))
+            {
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        products.Add(new Product
+                        {
+                            Id = (int)reader["Id"],
+                            Sku = (string)reader["Sku"],
+                            Name = (string)reader["Name"],
+                            Price = (decimal)reader["Price"],
+                            Stock = (int)reader["Stock"],
+                            Active = (bool)reader["Active"]
+                        });
+                    }
+                }
+            }
         }
+        return products;
     }
-}
-```
 
-#### SalesData.cs
-```csharp
+    // TODO: Métodos para Insertar, Actualizar y Eliminar productos
+}
+
+// === SalesData.cs ===
 public class SalesData
 {
     public void InsertSale(Sale sale, List<SaleItem> saleItems)
     {
-        using (var connection = Db.GetConnection())
+        using (var conn = Db.GetConnection())
         {
-            connection.Open();
-            using (var transaction = connection.BeginTransaction())
+            conn.Open();
+            using (var transaction = conn.BeginTransaction())
             {
                 try
                 {
-                    var command = new SqlCommand("INSERT INTO Sales (CashierUserId, Subtotal, Tax, Total) OUTPUT INSERTED.Id VALUES (@CashierUserId, @Subtotal, @Tax, @Total)", connection, transaction);
-                    command.Parameters.AddWithValue("@CashierUserId", sale.CashierUserId);
-                    command.Parameters.AddWithValue("@Subtotal", sale.Subtotal);
-                    command.Parameters.AddWithValue("@Tax", sale.Tax);
-                    command.Parameters.AddWithValue("@Total", sale.Total);
-                    sale.Id = (int)command.ExecuteScalar();
+                    // Insertar venta
+                    using (var cmd = new SqlCommand("INSERT INTO Sales (CashierUserId, Subtotal, Tax, Total) OUTPUT INSERTED.Id VALUES (@CashierUserId, @Subtotal, @Tax, @Total)", conn, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@CashierUserId", sale.CashierUserId);
+                        cmd.Parameters.AddWithValue("@Subtotal", sale.Subtotal);
+                        cmd.Parameters.AddWithValue("@Tax", sale.Tax);
+                        cmd.Parameters.AddWithValue("@Total", sale.Total);
+                        sale.Id = (int)cmd.ExecuteScalar();
+                    }
 
+                    // Insertar items de venta
                     foreach (var item in saleItems)
                     {
-                        command = new SqlCommand("INSERT INTO SaleItems (SaleId, ProductId, Quantity, UnitPrice, LineTotal) VALUES (@SaleId, @ProductId, @Quantity, @UnitPrice, @LineTotal)", connection, transaction);
-                        command.Parameters.AddWithValue("@SaleId", sale.Id);
-                        command.Parameters.AddWithValue("@ProductId", item.ProductId);
-                        command.Parameters.AddWithValue("@Quantity", item.Quantity);
-                        command.Parameters.AddWithValue("@UnitPrice", item.UnitPrice);
-                        command.Parameters.AddWithValue("@LineTotal", item.LineTotal);
-                        command.ExecuteNonQuery();
+                        using (var cmd = new SqlCommand("INSERT INTO SaleItems (SaleId, ProductId, Quantity, UnitPrice, LineTotal) VALUES (@SaleId, @ProductId, @Quantity, @UnitPrice, @LineTotal)", conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@SaleId", sale.Id);
+                            cmd.Parameters.AddWithValue("@ProductId", item.ProductId);
+                            cmd.Parameters.AddWithValue("@Quantity", item.Quantity);
+                            cmd.Parameters.AddWithValue("@UnitPrice", item.UnitPrice);
+                            cmd.Parameters.AddWithValue("@LineTotal", item.LineTotal);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // TODO: Descontar stock del producto
                     }
 
                     transaction.Commit();
@@ -284,7 +306,7 @@ public class SalesData
                 catch
                 {
                     transaction.Rollback();
-                    throw; // Manejo de errores genérico
+                    throw; // Manejo de errores
                 }
             }
         }
@@ -293,8 +315,8 @@ public class SalesData
 ```
 
 ### Servicios en App_Code/Services
-#### AuthService.cs
 ```csharp
+// === AuthService.cs ===
 public class AuthService
 {
     public User Login(string email, string password)
@@ -303,11 +325,12 @@ public class AuthService
         var user = userData.GetUserByEmail(email);
         if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
         {
+            // Establecer sesión
             HttpContext.Current.Session["uid"] = user.Id;
             HttpContext.Current.Session["role"] = user.Role;
             return user;
         }
-        return null; // Login fallido
+        return null; // Credenciales inválidas
     }
 
     public void Logout()
@@ -315,15 +338,16 @@ public class AuthService
         HttpContext.Current.Session.Clear();
     }
 }
-```
 
-#### SalesService.cs
-```csharp
+// === SalesService.cs ===
 public class SalesService
 {
     public void CreateSale(Sale sale, List<SaleItem> saleItems)
     {
-        // Validar stock y calcular IVA
+        // TODO: Validar stock
+        sale.Tax = sale.Subtotal * 0.16m; // Calcular IVA
+        sale.Total = sale.Subtotal + sale.Tax;
+
         var salesData = new SalesData();
         salesData.InsertSale(sale, saleItems);
     }
@@ -331,7 +355,7 @@ public class SalesService
 ```
 
 ### Pautas para páginas
-- En `Page_Load` de páginas protegidas:
+- En `Page_Load` de páginas protegidas: 
 ```csharp
 if (Session["uid"] == null)
 {
@@ -341,37 +365,37 @@ if (Session["uid"] == null)
 - `Users.aspx` y `Products.aspx`: solo acceso Admin.
 
 ### Seguridad mínima
-- **SQL parametrizado**: Se utiliza en todas las consultas.
-- **BCrypt**: Se usa para el hash de contraseñas.
-- **Validación en servidor**: Se implementa en las páginas.
-- **Anti-XSS**: Se utiliza `Server.HtmlEncode` donde sea necesario.
-- **Manejo de errores**: Se capturan excepciones y se muestran mensajes genéricos.
-
----
+- SQL parametrizado en todas las consultas.
+- Hash de contraseñas con BCrypt.
+- Validación en servidor.
+- Anti-XSS con `Server.HtmlEncode`.
+- Mensajes de error genéricos.
 
 ## 4) FRONTEND (WEB FORMS CON CONTROLES ASP.NET + ESTILOS PROPIOS)
 
 ### Menú de navegación (header superior)
-- Diseñar el menú en la parte superior con fondo `#353A40` y texto blanco.
-- Opciones: Home, Users, Products, CashRegister, SalesReport, Logout.
+- Diseñar el menú en la parte superior (barra horizontal fija/sencilla).
+- Fondo del menú: `#353A40`.
+- Texto de los ítems del menú: **blanco**.
+- Mostrar opciones: Home, Users, Products, CashRegister, SalesReport, Logout.
 - Ocultar o desactivar enlaces según el rol (`Session["role"]`).
 
-### Paleta de colores
-- Menú superior: fondo `#353A40`, texto blanco.
-- Fondos generales: `#F5F6FA`, texto negro.
-- Encabezado de GridView: fondo `#19A1B9`, texto blanco.
-- Botones principales: fondo `#0F6AF6`, texto blanco.
-- Botones de acción crítica: fondo `#E13C4A`, texto blanco.
-- Contenido normal: texto negro.
+### Paleta de colores obligatoria en toda la app
+- Menú superior (navbar): fondo `#353A40`, **texto blanco**.
+- Fondos generales: `#F5F6FA`, **texto negro**.
+- Encabezado de GridView: fondo `#19A1B9`, **texto blanco**.
+- Botones principales: fondo `#0F6AF6`, **texto blanco**.
+- Botones de acción crítica (eliminar/cancelar): fondo `#E13C4A`, **texto blanco**.
+- Todo el contenido normal (labels, texto en formularios): **negro**.
 
 ### Site.Master
-```aspx
+```html
 <%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="YourNamespace.Site" %>
 <!DOCTYPE html>
-<html>
+<html lang="es-MX">
 <head runat="server">
-    <title></title>
-    <link href="Styles/Site.css" rel="stylesheet" type="text/css" />
+    <title>POS System</title>
+    <link href="Styles/Site.css" rel="stylesheet" />
 </head>
 <body>
     <form id="form1" runat="server">
@@ -394,36 +418,36 @@ if (Session["uid"] == null)
 ```
 
 ### Páginas (.aspx) con controles ASP.NET y validadores
-#### Login.aspx
-```aspx
+```html
+// === Login.aspx ===
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="YourNamespace.Login" %>
 <!DOCTYPE html>
-<html>
+<html lang="es-MX">
 <head runat="server">
     <title>Login</title>
 </head>
 <body>
     <form id="form1" runat="server">
         <div>
-            <asp:TextBox ID="txtEmail" runat="server" placeholder="Email"></asp:TextBox>
+            <asp:Label ID="lblEmail" runat="server" Text="Email:" />
+            <asp:TextBox ID="txtEmail" runat="server" />
             <asp:RequiredFieldValidator ID="rfvEmail" runat="server" ControlToValidate="txtEmail" ErrorMessage="Email es requerido." />
-            <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" placeholder="Contraseña"></asp:TextBox>
-            <asp:RequiredFieldValidator ID="rfvPassword" runat="server" ControlToValidate="txtPassword" ErrorMessage="Contraseña es requerida." />
+            <asp:Label ID="lblPassword" runat="server" Text="Password:" />
+            <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" />
+            <asp:RequiredFieldValidator ID="rfvPassword" runat="server" ControlToValidate="txtPassword" ErrorMessage="Password es requerido." />
             <asp:Button ID="btnLogin" runat="server" Text="Iniciar" OnClick="btnLogin_Click" />
             <asp:ValidationSummary ID="vsLogin" runat="server" />
         </div>
     </form>
 </body>
 </html>
-```
 
-#### Default.aspx
-```aspx
+// === Default.aspx ===
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="YourNamespace.Default" %>
 <!DOCTYPE html>
-<html>
+<html lang="es-MX">
 <head runat="server">
-    <title>Inicio</title>
+    <title>Bienvenido</title>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -433,13 +457,11 @@ if (Session["uid"] == null)
     </form>
 </body>
 </html>
-```
 
-#### Users.aspx (solo Admin)
-```aspx
+// === Users.aspx ===
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Users.aspx.cs" Inherits="YourNamespace.Users" %>
 <!DOCTYPE html>
-<html>
+<html lang="es-MX">
 <head runat="server">
     <title>Usuarios</title>
 </head>
@@ -453,21 +475,21 @@ if (Session["uid"] == null)
                     <asp:TemplateField>
                         <ItemTemplate>
                             <asp:Button ID="btnEdit" runat="server" Text="Editar" CommandArgument='<%# Eval("Id") %>' OnClick="btnEdit_Click" />
+                            <asp:Button ID="btnDelete" runat="server" Text="Eliminar" CommandArgument='<%# Eval("Id") %>' OnClick="btnDelete_Click" />
                         </ItemTemplate>
                     </asp:TemplateField>
                 </Columns>
             </asp:GridView>
+            <asp:Button ID="btnAddUser" runat="server" Text="Agregar Usuario" OnClick="btnAddUser_Click" />
         </div>
     </form>
 </body>
 </html>
-```
 
-#### Products.aspx (solo Admin)
-```aspx
+// === Products.aspx ===
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Products.aspx.cs" Inherits="YourNamespace.Products" %>
 <!DOCTYPE html>
-<html>
+<html lang="es-MX">
 <head runat="server">
     <title>Productos</title>
 </head>
@@ -483,8 +505,65 @@ if (Session["uid"] == null)
                     <asp:TemplateField>
                         <ItemTemplate>
                             <asp:Button ID="btnEdit" runat="server" Text="Editar" CommandArgument='<%# Eval("Id") %>' OnClick="btnEdit_Click" />
+                            <asp:Button ID="btnDelete" runat="server" Text="Eliminar" CommandArgument='<%# Eval("Id") %>' OnClick="btnDelete_Click" />
                         </ItemTemplate>
                     </asp:TemplateField>
+                </Columns>
+            </asp:GridView>
+            <asp:Button ID="btnAddProduct" runat="server" Text="Agregar Producto" OnClick="btnAddProduct_Click" />
+        </div>
+    </form>
+</body>
+</html>
+
+// === CashRegister.aspx ===
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CashRegister.aspx.cs" Inherits="YourNamespace.CashRegister" %>
+<!DOCTYPE html>
+<html lang="es-MX">
+<head runat="server">
+    <title>Caja</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:DropDownList ID="ddlProducts" runat="server">
+                <!-- TODO: Llenar productos activos -->
+            </asp:DropDownList>
+            <asp:TextBox ID="txtQuantity" runat="server" />
+            <asp:Button ID="btnAddToCart" runat="server" Text="Agregar" OnClick="btnAddToCart_Click" />
+            <asp:GridView ID="gvCart" runat="server" AutoGenerateColumns="False">
+                <Columns>
+                    <asp:BoundField DataField="ProductName" HeaderText="Producto" />
+                    <asp:BoundField DataField="Quantity" HeaderText="Cantidad" />
+                    <asp:BoundField DataField="LineTotal" HeaderText="Total" />
+                </Columns>
+            </asp:GridView>
+            <asp:Label ID="lblSubtotal" runat="server" Text="Subtotal: $" />
+            <asp:Label ID="lblTax" runat="server" Text="IVA: $" />
+            <asp:Label ID="lblTotal" runat="server" Text="Total: $" />
+            <asp:Button ID="btnRegisterSale" runat="server" Text="Registrar Venta" OnClick="btnRegisterSale_Click" />
+        </div>
+    </form>
+</body>
+</html>
+
+// === SalesReport.aspx ===
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="SalesReport.aspx.cs" Inherits="YourNamespace.SalesReport" %>
+<!DOCTYPE html>
+<html lang="es-MX">
+<head runat="server">
+    <title>Reporte de Ventas</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:TextBox ID="txtDateFrom" runat="server" />
+            <asp:TextBox ID="txtDateTo" runat="server" />
+            <asp:Button ID="btnGenerateReport" runat="server" Text="Generar Reporte" OnClick="btnGenerateReport_Click" />
+            <asp:GridView ID="gvSalesReport" runat="server" AutoGenerateColumns="False">
+                <Columns>
+                    <asp:BoundField DataField="SaleId" HeaderText="ID Venta" />
+                    <asp:BoundField DataField="Total" HeaderText="Total" />
                 </Columns>
             </asp:GridView>
         </div>
@@ -493,55 +572,9 @@ if (Session["uid"] == null)
 </html>
 ```
 
-#### CashRegister.aspx (Admin/Cashier)
-```aspx
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CashRegister.aspx.cs" Inherits="YourNamespace.CashRegister" %>
-<!DOCTYPE html>
-<html>
-<head runat="server">
-    <title>Caja</title>
-</head>
-<body>
-    <form id="form1" runat="server">
-        <div>
-            <asp:DropDownList ID="ddlProducts" runat="server"></asp:DropDownList>
-            <asp:TextBox ID="txtQuantity" runat="server" placeholder="Cantidad"></asp:TextBox>
-            <asp:Button ID="btnAdd" runat="server" Text="Agregar" OnClick="btnAdd_Click" />
-            <asp:GridView ID="gvCart" runat="server"></asp:GridView>
-            <asp:Label ID="lblSubtotal" runat="server" Text="Subtotal: "></asp:Label>
-            <asp:Label ID="lblTax" runat="server" Text="IVA: "></asp:Label>
-            <asp:Label ID="lblTotal" runat="server" Text="Total: "></asp:Label>
-            <asp:Button ID="btnRegisterSale" runat="server" Text="Registrar Venta" OnClick="btnRegisterSale_Click" />
-        </div>
-    </form>
-</body>
-</html>
-```
-
-#### SalesReport.aspx (Admin/Cashier)
-```aspx
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="SalesReport.aspx.cs" Inherits="YourNamespace.SalesReport" %>
-<!DOCTYPE html>
-<html>
-<head runat="server">
-    <title>Reporte de Ventas</title>
-</head>
-<body>
-    <form id="form1" runat="server">
-        <div>
-            <asp:TextBox ID="txtDateFrom" runat="server" placeholder="Fecha Desde"></asp:TextBox>
-            <asp:TextBox ID="txtDateTo" runat="server" placeholder="Fecha Hasta"></asp:TextBox>
-            <asp:Button ID="btnSearch" runat="server" Text="Buscar" OnClick="btnSearch_Click" />
-            <asp:GridView ID="gvSales" runat="server"></asp:GridView>
-        </div>
-    </form>
-</body>
-</html>
-```
-
 ### Estilos
-#### Styles/Site.css
 ```css
+/* === Styles/Site.css === */
 body {
     background-color: #F5F6FA;
     color: black;
@@ -562,7 +595,7 @@ body {
     float: left;
 }
 
-.navbar li a {
+.navbar a {
     display: block;
     color: white;
     text-align: center;
@@ -570,11 +603,11 @@ body {
     text-decoration: none;
 }
 
-.navbar li a:hover {
+.navbar a:hover {
     background-color: #19A1B9;
 }
 
-.gridview-header {
+.grid-header {
     background-color: #19A1B9;
     color: white;
 }
@@ -590,17 +623,475 @@ body {
 }
 ```
 
-### (Opcional) App_Themes/PosTheme/PosTheme.skin
+## 5) GENERACIÓN DEL CÓDIGO COMPLETO DEL PROYECTO
+
+### a) Web.config
 ```xml
-<asp:GridView runat="server" CssClass="gridview-header" />
-<asp:Button runat="server" CssClass="button-primary" />
-<asp:Button runat="server" CssClass="button-danger" />
+<configuration>
+  <connectionStrings>
+    <add name="POS_DB" connectionString="Data Source=.;Initial Catalog=POS_DB;Integrated Security=True;" providerName="System.Data.SqlClient" />
+  </connectionStrings>
+  <globalization culture="es-MX" uiCulture="es-MX" />
+  <compilation targetFramework="4.8" />
+  <sessionState timeout="20" />
+  <pages validateRequest="true" viewStateEncryptionMode="Always" />
+  <httpRuntime requestValidationMode="2.0" />
+</configuration>
 ```
 
----
+### b) App_Code/Models
+```csharp
+// === User.cs ===
+public class User
+{
+    public int Id { get; set; }
+    public string Email { get; set; }
+    public string PasswordHash { get; set; }
+    public string Role { get; set; }
+    public bool Active { get; set; }
+}
+
+// === Product.cs ===
+public class Product
+{
+    public int Id { get; set; }
+    public string Sku { get; set; }
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+    public int Stock { get; set; }
+    public bool Active { get; set; }
+}
+
+// === Sale.cs ===
+public class Sale
+{
+    public int Id { get; set; }
+    public DateTime CreatedAtUtc { get; set; }
+    public int CashierUserId { get; set; }
+    public decimal Subtotal { get; set; }
+    public decimal Tax { get; set; }
+    public decimal Total { get; set; }
+}
+
+// === SaleItem.cs ===
+public class SaleItem
+{
+    public int Id { get; set; }
+    public int SaleId { get; set; }
+    public int ProductId { get; set; }
+    public int Quantity { get; set; }
+    public decimal UnitPrice { get; set; }
+    public decimal LineTotal { get; set; }
+}
+```
+
+### c) App_Code/Data
+```csharp
+// === Db.cs ===
+public static class Db
+{
+    public static SqlConnection GetConnection()
+    {
+        return new SqlConnection(ConfigurationManager.ConnectionStrings["POS_DB"].ConnectionString);
+    }
+}
+
+// === UserData.cs ===
+public class UserData
+{
+    public User GetUserByEmail(string email)
+    {
+        using (var conn = Db.GetConnection())
+        {
+            conn.Open();
+            using (var cmd = new SqlCommand("SELECT Id, Email, PasswordHash, Role, Active FROM Users WHERE Email = @Email", conn))
+            {
+                cmd.Parameters.AddWithValue("@Email", email);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return new User
+                        {
+                            Id = (int)reader["Id"],
+                            Email = (string)reader["Email"],
+                            PasswordHash = (string)reader["PasswordHash"],
+                            Role = (string)reader["Role"],
+                            Active = (bool)reader["Active"]
+                        };
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    // TODO: Métodos para Insertar, Actualizar y Eliminar usuarios
+}
+
+// === ProductData.cs ===
+public class ProductData
+{
+    public List<Product> GetAllProducts()
+    {
+        var products = new List<Product>();
+        using (var conn = Db.GetConnection())
+        {
+            conn.Open();
+            using (var cmd = new SqlCommand("SELECT Id, Sku, Name, Price, Stock, Active FROM Products", conn))
+            {
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        products.Add(new Product
+                        {
+                            Id = (int)reader["Id"],
+                            Sku = (string)reader["Sku"],
+                            Name = (string)reader["Name"],
+                            Price = (decimal)reader["Price"],
+                            Stock = (int)reader["Stock"],
+                            Active = (bool)reader["Active"]
+                        });
+                    }
+                }
+            }
+        }
+        return products;
+    }
+
+    // TODO: Métodos para Insertar, Actualizar y Eliminar productos
+}
+
+// === SalesData.cs ===
+public class SalesData
+{
+    public void InsertSale(Sale sale, List<SaleItem> saleItems)
+    {
+        using (var conn = Db.GetConnection())
+        {
+            conn.Open();
+            using (var transaction = conn.BeginTransaction())
+            {
+                try
+                {
+                    // Insertar venta
+                    using (var cmd = new SqlCommand("INSERT INTO Sales (CashierUserId, Subtotal, Tax, Total) OUTPUT INSERTED.Id VALUES (@CashierUserId, @Subtotal, @Tax, @Total)", conn, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@CashierUserId", sale.CashierUserId);
+                        cmd.Parameters.AddWithValue("@Subtotal", sale.Subtotal);
+                        cmd.Parameters.AddWithValue("@Tax", sale.Tax);
+                        cmd.Parameters.AddWithValue("@Total", sale.Total);
+                        sale.Id = (int)cmd.ExecuteScalar();
+                    }
+
+                    // Insertar items de venta
+                    foreach (var item in saleItems)
+                    {
+                        using (var cmd = new SqlCommand("INSERT INTO SaleItems (SaleId, ProductId, Quantity, UnitPrice, LineTotal) VALUES (@SaleId, @ProductId, @Quantity, @UnitPrice, @LineTotal)", conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@SaleId", sale.Id);
+                            cmd.Parameters.AddWithValue("@ProductId", item.ProductId);
+                            cmd.Parameters.AddWithValue("@Quantity", item.Quantity);
+                            cmd.Parameters.AddWithValue("@UnitPrice", item.UnitPrice);
+                            cmd.Parameters.AddWithValue("@LineTotal", item.LineTotal);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // TODO: Descontar stock del producto
+                    }
+
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw; // Manejo de errores
+                }
+            }
+        }
+    }
+}
+```
+
+### d) App_Code/Services
+```csharp
+// === AuthService.cs ===
+public class AuthService
+{
+    public User Login(string email, string password)
+    {
+        var userData = new UserData();
+        var user = userData.GetUserByEmail(email);
+        if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+        {
+            // Establecer sesión
+            HttpContext.Current.Session["uid"] = user.Id;
+            HttpContext.Current.Session["role"] = user.Role;
+            return user;
+        }
+        return null; // Credenciales inválidas
+    }
+
+    public void Logout()
+    {
+        HttpContext.Current.Session.Clear();
+    }
+}
+
+// === SalesService.cs ===
+public class SalesService
+{
+    public void CreateSale(Sale sale, List<SaleItem> saleItems)
+    {
+        // TODO: Validar stock
+        sale.Tax = sale.Subtotal * 0.16m; // Calcular IVA
+        sale.Total = sale.Subtotal + sale.Tax;
+
+        var salesData = new SalesData();
+        salesData.InsertSale(sale, saleItems);
+    }
+}
+```
+
+### e) Site.Master
+```html
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="YourNamespace.Site" %>
+<!DOCTYPE html>
+<html lang="es-MX">
+<head runat="server">
+    <title>POS System</title>
+    <link href="Styles/Site.css" rel="stylesheet" />
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div class="navbar">
+            <ul>
+                <li><a href="Default.aspx">Home</a></li>
+                <% if (Session["role"] != null && Session["role"].ToString() == "Admin") { %>
+                    <li><a href="Users.aspx">Users</a></li>
+                    <li><a href="Products.aspx">Products</a></li>
+                <% } %>
+                <li><a href="CashRegister.aspx">Cash Register</a></li>
+                <li><a href="SalesReport.aspx">Sales Report</a></li>
+                <li><a href="Logout.aspx">Logout</a></li>
+            </ul>
+        </div>
+        <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+    </form>
+</body>
+</html>
+```
+
+### f) Styles/Site.css
+```css
+/* === Styles/Site.css === */
+body {
+    background-color: #F5F6FA;
+    color: black;
+}
+
+.navbar {
+    background-color: #353A40;
+    overflow: hidden;
+}
+
+.navbar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar li {
+    float: left;
+}
+
+.navbar a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.navbar a:hover {
+    background-color: #19A1B9;
+}
+
+.grid-header {
+    background-color: #19A1B9;
+    color: white;
+}
+
+.button-primary {
+    background-color: #0F6AF6;
+    color: white;
+}
+
+.button-danger {
+    background-color: #E13C4A;
+    color: white;
+}
+```
+
+### g) Páginas .aspx y .aspx.cs
+```html
+// === Login.aspx ===
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="YourNamespace.Login" %>
+<!DOCTYPE html>
+<html lang="es-MX">
+<head runat="server">
+    <title>Login</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:Label ID="lblEmail" runat="server" Text="Email:" />
+            <asp:TextBox ID="txtEmail" runat="server" />
+            <asp:RequiredFieldValidator ID="rfvEmail" runat="server" ControlToValidate="txtEmail" ErrorMessage="Email es requerido." />
+            <asp:Label ID="lblPassword" runat="server" Text="Password:" />
+            <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" />
+            <asp:RequiredFieldValidator ID="rfvPassword" runat="server" ControlToValidate="txtPassword" ErrorMessage="Password es requerido." />
+            <asp:Button ID="btnLogin" runat="server" Text="Iniciar" OnClick="btnLogin_Click" />
+            <asp:ValidationSummary ID="vsLogin" runat="server" />
+        </div>
+    </form>
+</body>
+</html>
+
+// === Default.aspx ===
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="YourNamespace.Default" %>
+<!DOCTYPE html>
+<html lang="es-MX">
+<head runat="server">
+    <title>Bienvenido</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <h1>Bienvenido, <%: Session["role"] %></h1>
+        </div>
+    </form>
+</body>
+</html>
+
+// === Users.aspx ===
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Users.aspx.cs" Inherits="YourNamespace.Users" %>
+<!DOCTYPE html>
+<html lang="es-MX">
+<head runat="server">
+    <title>Usuarios</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:GridView ID="gvUsers" runat="server" AutoGenerateColumns="False">
+                <Columns>
+                    <asp:BoundField DataField="Email" HeaderText="Email" />
+                    <asp:BoundField DataField="Role" HeaderText="Rol" />
+                    <asp:TemplateField>
+                        <ItemTemplate>
+                            <asp:Button ID="btnEdit" runat="server" Text="Editar" CommandArgument='<%# Eval("Id") %>' OnClick="btnEdit_Click" />
+                            <asp:Button ID="btnDelete" runat="server" Text="Eliminar" CommandArgument='<%# Eval("Id") %>' OnClick="btnDelete_Click" />
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                </Columns>
+            </asp:GridView>
+            <asp:Button ID="btnAddUser" runat="server" Text="Agregar Usuario" OnClick="btnAddUser_Click" />
+        </div>
+    </form>
+</body>
+</html>
+
+// === Products.aspx ===
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Products.aspx.cs" Inherits="YourNamespace.Products" %>
+<!DOCTYPE html>
+<html lang="es-MX">
+<head runat="server">
+    <title>Productos</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:GridView ID="gvProducts" runat="server" AutoGenerateColumns="False">
+                <Columns>
+                    <asp:BoundField DataField="Sku" HeaderText="SKU" />
+                    <asp:BoundField DataField="Name" HeaderText="Nombre" />
+                    <asp:BoundField DataField="Price" HeaderText="Precio" />
+                    <asp:BoundField DataField="Stock" HeaderText="Stock" />
+                    <asp:TemplateField>
+                        <ItemTemplate>
+                            <asp:Button ID="btnEdit" runat="server" Text="Editar" CommandArgument='<%# Eval("Id") %>' OnClick="btnEdit_Click" />
+                            <asp:Button ID="btnDelete" runat="server" Text="Eliminar" CommandArgument='<%# Eval("Id") %>' OnClick="btnDelete_Click" />
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                </Columns>
+            </asp:GridView>
+            <asp:Button ID="btnAddProduct" runat="server" Text="Agregar Producto" OnClick="btnAddProduct_Click" />
+        </div>
+    </form>
+</body>
+</html>
+
+// === CashRegister.aspx ===
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CashRegister.aspx.cs" Inherits="YourNamespace.CashRegister" %>
+<!DOCTYPE html>
+<html lang="es-MX">
+<head runat="server">
+    <title>Caja</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:DropDownList ID="ddlProducts" runat="server">
+                <!-- TODO: Llenar productos activos -->
+            </asp:DropDownList>
+            <asp:TextBox ID="txtQuantity" runat="server" />
+            <asp:Button ID="btnAddToCart" runat="server" Text="Agregar" OnClick="btnAddToCart_Click" />
+            <asp:GridView ID="gvCart" runat="server" AutoGenerateColumns="False">
+                <Columns>
+                    <asp:BoundField DataField="ProductName" HeaderText="Producto" />
+                    <asp:BoundField DataField="Quantity" HeaderText="Cantidad" />
+                    <asp:BoundField DataField="LineTotal" HeaderText="Total" />
+                </Columns>
+            </asp:GridView>
+            <asp:Label ID="lblSubtotal" runat="server" Text="Subtotal: $" />
+            <asp:Label ID="lblTax" runat="server" Text="IVA: $" />
+            <asp:Label ID="lblTotal" runat="server" Text="Total: $" />
+            <asp:Button ID="btnRegisterSale" runat="server" Text="Registrar Venta" OnClick="btnRegisterSale_Click" />
+        </div>
+    </form>
+</body>
+</html>
+
+// === SalesReport.aspx ===
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="SalesReport.aspx.cs" Inherits="YourNamespace.SalesReport" %>
+<!DOCTYPE html>
+<html lang="es-MX">
+<head runat="server">
+    <title>Reporte de Ventas</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:TextBox ID="txtDateFrom" runat="server" />
+            <asp:TextBox ID="txtDateTo" runat="server" />
+            <asp:Button ID="btnGenerateReport" runat="server" Text="Generar Reporte" OnClick="btnGenerateReport_Click" />
+            <asp:GridView ID="gvSalesReport" runat="server" AutoGenerateColumns="False">
+                <Columns>
+                    <asp:BoundField DataField="SaleId" HeaderText="ID Venta" />
+                    <asp:BoundField DataField="Total" HeaderText="Total" />
+                </Columns>
+            </asp:GridView>
+        </div>
+    </form>
+</body>
+</html>
+```
 
 ### Comentarios sobre decisiones de seguridad
-- **SQL parametrizado**: Se utiliza en todas las consultas para prevenir inyecciones SQL.
-- **Hash seguro**: Se implementa BCrypt para almacenar contraseñas de forma segura.
-- **Validación en servidor**: Se asegura que todos los datos de entrada sean validados antes de procesarlos.
-- **Manejo de sesión**: Se utiliza `Session` para mantener la autenticación del usuario sin depender de cookies, asegurando que la información sensible no se exponga.
+- Se utilizó SQL parametrizado en todas las consultas para prevenir inyecciones SQL.
+- Las contraseñas se almacenan como hashes utilizando BCrypt, evitando el almacenamiento en texto plano.
+- Se implementó validación en el servidor para entradas de usuario.
+- Se redirige a la página de login si la sesión no está activa.
+- Se controla el acceso a páginas y botones según el rol del usuario almacenado en la sesión.
