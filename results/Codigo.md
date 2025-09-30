@@ -1,4 +1,4 @@
-A continuación, se presenta el código en C# para los eventos de los botones en las páginas Web Forms que has especificado. Este código incluye la lógica para guardar la información en la base de datos y mostrarla en los controles correspondientes.
+A continuación, se presenta el código en C# para los eventos de los botones en las páginas .aspx que has proporcionado. Este código incluye la lógica para guardar la información en la base de datos y mostrarla en los controles correspondientes.
 
 ### Login.aspx.cs
 ```csharp
@@ -84,38 +84,40 @@ namespace YourNamespace
 
         protected void btnNew_Click(object sender, EventArgs e)
         {
-            // Limpiar el formulario para nuevo usuario
             fvUser.ChangeMode(FormViewMode.Insert);
             fvUser.DataBind();
         }
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            // Guardar usuario
-            var user = new User
-            {
-                Email = ((TextBox)fvUser.FindControl("txtEmail")).Text,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(((TextBox)fvUser.FindControl("txtPassword")).Text),
-                Role = ((DropDownList)fvUser.FindControl("ddlRole")).SelectedValue,
-                Active = ((CheckBox)fvUser.FindControl("chkActive")).Checked
-            };
-
             if (fvUser.CurrentMode == FormViewMode.Insert)
             {
+                // TODO: Implement Insert logic
+                var user = new User
+                {
+                    Email = ((TextBox)fvUser.FindControl("txtEmail")).Text,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(((TextBox)fvUser.FindControl("txtPassword")).Text),
+                    Role = ((DropDownList)fvUser.FindControl("ddlRole")).SelectedValue,
+                    Active = true
+                };
                 userData.Insert(user);
             }
             else if (fvUser.CurrentMode == FormViewMode.Edit)
             {
-                user.Id = (int)gvUsers.SelectedDataKey.Value;
+                // TODO: Implement Update logic
+                var userId = (int)gvUsers.SelectedDataKey.Value;
+                var user = userData.GetById(userId);
+                user.Email = ((TextBox)fvUser.FindControl("txtEmail")).Text;
+                user.Role = ((DropDownList)fvUser.FindControl("ddlRole")).SelectedValue;
                 userData.Update(user);
             }
-
             LoadUsers();
         }
 
         protected void btnDelete_Command(object sender, CommandEventArgs e)
         {
-            int userId = Convert.ToInt32(e.CommandArgument);
+            // TODO: Implement Delete logic
+            var userId = (int)e.CommandArgument;
             userData.Delete(userId);
             LoadUsers();
         }
@@ -163,31 +165,36 @@ namespace YourNamespace
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            var product = new Product
-            {
-                Sku = ((TextBox)fvProduct.FindControl("txtSku")).Text,
-                Name = ((TextBox)fvProduct.FindControl("txtName")).Text,
-                Price = decimal.Parse(((TextBox)fvProduct.FindControl("txtPrice")).Text),
-                Stock = int.Parse(((TextBox)fvProduct.FindControl("txtStock")).Text),
-                Active = ((CheckBox)fvProduct.FindControl("chkActive")).Checked
-            };
-
+            // TODO: Implement Insert/Update logic
             if (fvProduct.CurrentMode == FormViewMode.Insert)
             {
+                var product = new Product
+                {
+                    Sku = ((TextBox)fvProduct.FindControl("txtSku")).Text,
+                    Name = ((TextBox)fvProduct.FindControl("txtName")).Text,
+                    Price = decimal.Parse(((TextBox)fvProduct.FindControl("txtPrice")).Text),
+                    Stock = int.Parse(((TextBox)fvProduct.FindControl("txtStock")).Text),
+                    Active = true
+                };
                 productData.Insert(product);
             }
             else if (fvProduct.CurrentMode == FormViewMode.Edit)
             {
-                product.Id = (int)gvProducts.SelectedDataKey.Value;
+                var productId = (int)gvProducts.SelectedDataKey.Value;
+                var product = productData.GetById(productId);
+                product.Sku = ((TextBox)fvProduct.FindControl("txtSku")).Text;
+                product.Name = ((TextBox)fvProduct.FindControl("txtName")).Text;
+                product.Price = decimal.Parse(((TextBox)fvProduct.FindControl("txtPrice")).Text);
+                product.Stock = int.Parse(((TextBox)fvProduct.FindControl("txtStock")).Text);
                 productData.Update(product);
             }
-
             LoadProducts();
         }
 
         protected void btnDelete_Command(object sender, CommandEventArgs e)
         {
-            int productId = Convert.ToInt32(e.CommandArgument);
+            // TODO: Implement Delete logic
+            var productId = (int)e.CommandArgument;
             productData.Delete(productId);
             LoadProducts();
         }
@@ -243,7 +250,6 @@ namespace YourNamespace
         {
             int productId = int.Parse(ddlProducts.SelectedValue);
             int qty = int.Parse(txtQty.Text);
-
             cart.Add((productId, qty));
             UpdateCart();
         }
@@ -252,7 +258,7 @@ namespace YourNamespace
         {
             gvCart.DataSource = cart.Select(item => new
             {
-                ProductId = item.productId,
+                Product = productData.GetById(item.productId).Name,
                 Quantity = item.qty,
                 UnitPrice = productData.GetById(item.productId).Price,
                 LineTotal = item.qty * productData.GetById(item.productId).Price
@@ -269,9 +275,9 @@ namespace YourNamespace
         {
             int cashierUserId = (int)Session["uid"];
             salesService.CreateSale(cashierUserId, cart);
+            lblMessage.Text = "Venta registrada con éxito.";
             cart.Clear();
             UpdateCart();
-            lblMessage.Text = "Venta registrada con éxito.";
         }
     }
 }
@@ -301,20 +307,18 @@ namespace YourNamespace
         {
             DateTime fromDate = DateTime.Parse(txtFrom.Text);
             DateTime toDate = DateTime.Parse(txtTo.Text);
-            gvSales.DataSource = salesData.GetByDateRange(fromDate, toDate);
+            var sales = salesData.GetByDateRange(fromDate, toDate);
+            gvSales.DataSource = sales;
             gvSales.DataBind();
 
-            // Calcular total general
-            decimal totalGeneral = 0; // Asumiendo que SalesData tiene un método para calcular el total
-            lblTotalGeneral.Text = $"Total General: {totalGeneral:C}";
+            lblTotalGeneral.Text = $"Total General: {sales.Sum(s => s.Total):C}";
         }
     }
 }
 ```
 
-### Notas sobre seguridad
-- Se utiliza **hashing** para las contraseñas con BCrypt, evitando el almacenamiento de texto plano.
-- Se implementa **validación de sesión** en cada página para asegurar que el usuario esté autenticado.
-- Se utilizan **consultas parametrizadas** en todas las interacciones con la base de datos para prevenir SQL Injection.
-- Se maneja la **excepción** en las transacciones para asegurar la integridad de los datos.
-- Se utiliza `Session` para mantener el estado del usuario sin depender de cookies.
+### Notas de Seguridad
+- Se utiliza **parametrización** en todas las consultas SQL para prevenir inyecciones SQL.
+- Las contraseñas se almacenan como **hash** utilizando BCrypt, lo que proporciona un nivel de seguridad adecuado.
+- Se valida la entrada del usuario en el servidor y se utiliza `validateRequest="true"` en las páginas para prevenir ataques XSS.
+- Se gestiona la sesión del usuario sin utilizar cookies, asegurando que los datos de sesión se mantengan seguros.
