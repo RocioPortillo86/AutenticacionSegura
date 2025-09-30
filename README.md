@@ -22,4 +22,6 @@ En este rpositorio se ejecuta un promp de genera los siguientes archivos:
   
 - ventas_por_producto.png
     Grafico de Ventas
-.
+
+- peritaje_codigo.md
+      Contiene el peritaje del código generando una tabla de riesgos.
