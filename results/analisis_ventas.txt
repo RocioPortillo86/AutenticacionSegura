@@ -1,0 +1,17 @@
+**Resumen de Análisis de Ventas por Tipo de Producto**
+
+Al analizar los datos de ventas por tipo de producto, se observa lo siguiente:
+
+- **Lácteos** es la categoría con el mayor número de ventas, alcanzando un total de 150 unidades. Esto sugiere una alta demanda de productos lácteos entre los consumidores.
+- **Frutas** es la categoría con el menor número de ventas, con solo 60 unidades vendidas. Esto podría indicar una menor preferencia por frutas o una posible necesidad de mejorar la estrategia de ventas o distribución para esta categoría.
+- Las demás categorías se distribuyen de la siguiente manera: **Bebidas** con 120 unidades, **Panadería** con 90 unidades, y **Snacks** con 80 unidades.
+
+**Conclusiones:**
+
+1. La categoría de lácteos lidera en ventas, lo que podría ser aprovechado para expandir la oferta de productos o promociones en esta línea.
+2. La baja venta de frutas sugiere la necesidad de investigar las causas, como precios, calidad, o disponibilidad, para implementar mejoras.
+3. Las categorías de bebidas y panadería también muestran un buen desempeño, aunque hay espacio para incrementar las ventas de snacks.
+
+**Gráfico de Barras:**
+
+Para visualizar mejor las ventas por categoría, se recomienda generar un gráfico de barras que muestre las cantidades vendidas en cada categoría. Este gráfico ayudará a identificar visualmente las diferencias en ventas y facilitará la toma de decisiones estratégicas.
