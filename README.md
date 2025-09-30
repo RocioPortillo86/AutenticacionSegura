@@ -7,11 +7,12 @@ El sistema estará desarrollado en Visual Studio 2022 con C# y ASP.NET Framework
 
 Requisitos de Instalacion para correr aplicacipon
 -  Visual Studio 2022, .NET Framework 4.8, SQL Server Express una vez instalado descargar el paquete BCrypt.Net-Next
--  El proyecto del aplicativo lo guardare en la raiz de este repositorio se llama PuntoVentas
+-  El proyecto del aplicativo se puede descargar de este drive https://drive.google.com/file/d/1glEZBuRK5LXG2Y4w-4UM_HGBT2lIkvHD/view?usp=drive_link
 -  Para ingresar al Sistema se utiliza de usuario admin@example.com Pass: Admin123
 
 
 En este rpositorio se ejecuta un promp de genera los siguientes archivos:
+
 - EspecificacionesProyecto.md
     El cual incluye la configuración del entorno, Estructura Inicial del proyecto, Desarrollo Backend Core y FrintEnd
 - Codigo.md
