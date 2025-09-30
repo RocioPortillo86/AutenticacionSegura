@@ -3,15 +3,15 @@
 Al analizar los datos de ventas por tipo de producto, se observa lo siguiente:
 
 - **Lácteos** es la categoría con el mayor número de ventas, alcanzando un total de 150 unidades. Esto sugiere una alta demanda de productos lácteos entre los consumidores.
-- **Frutas** es la categoría con el menor número de ventas, con solo 60 unidades vendidas. Esto podría indicar una menor preferencia por frutas o una posible necesidad de mejorar la estrategia de ventas o distribución para esta categoría.
-- Las demás categorías se distribuyen de la siguiente manera: **Bebidas** con 120 unidades, **Panadería** con 90 unidades, y **Snacks** con 80 unidades.
+- **Frutas** es la categoría con el menor número de ventas, con solo 60 unidades vendidas. Esto podría indicar una menor preferencia por frutas o una posible necesidad de revisar la estrategia de ventas para esta categoría.
+- Las otras categorías presentan ventas intermedias: **Bebidas** con 120 unidades, **Panadería** con 90 unidades, y **Snacks** con 80 unidades.
 
 **Conclusiones:**
 
-1. La categoría de lácteos lidera en ventas, lo que podría ser aprovechado para expandir la oferta de productos o promociones en esta línea.
-2. La baja venta de frutas sugiere la necesidad de investigar las causas, como precios, calidad, o disponibilidad, para implementar mejoras.
-3. Las categorías de bebidas y panadería también muestran un buen desempeño, aunque hay espacio para incrementar las ventas de snacks.
+1. Los productos lácteos son los más vendidos, lo que podría ser una oportunidad para expandir la oferta en esta categoría o realizar promociones para mantener el interés.
+2. La baja venta de frutas sugiere que se podría investigar más a fondo las razones detrás de esta tendencia, como precios, calidad, o disponibilidad, y ajustar la estrategia en consecuencia.
+3. Las categorías de Bebidas, Panadería y Snacks tienen un rendimiento moderado, lo que podría indicar estabilidad en su demanda.
 
 **Gráfico de Barras:**
 
-Para visualizar mejor las ventas por categoría, se recomienda generar un gráfico de barras que muestre las cantidades vendidas en cada categoría. Este gráfico ayudará a identificar visualmente las diferencias en ventas y facilitará la toma de decisiones estratégicas.
+Para visualizar mejor las ventas por categoría, se recomienda generar un gráfico de barras que muestre las cantidades vendidas en cada categoría. Esto ayudará a identificar visualmente las diferencias en las ventas y facilitará la toma de decisiones estratégicas.
