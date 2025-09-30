@@ -5,7 +5,7 @@
 📏 Tamaño (bytes): 17603
 🧪 Existe?: True
 
-A continuación, se presenta el código en C# para los eventos de los botones en las páginas .aspx que has proporcionado. Este código incluye la lógica para guardar la información en la base de datos y mostrarla en los controles correspondientes.
+A continuación, se presenta el código en C# para los eventos de los botones en las páginas .aspx que has mencionado. Este código incluye la lógica para guardar la información en la base de datos y mostrarla en los controles correspondientes.
 
 ### Login.aspx.cs
 ```csharp
@@ -119,7 +119,6 @@ namespace YourNamespace
                 {
                     Id = (int)gvUsers.SelectedDataKey.Value,
                     Email = ((TextBox)fvUser.FindControl("txtEmail")).Text,
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(((TextBox)fvUser.FindControl("txtPassword")).Text),
                     Role = ((DropDownList)fvUser.FindControl("ddlRole")).SelectedValue,
                     Active = ((CheckBox)fvUser.FindControl("chkActive")).Checked
                 };
@@ -245,15 +244,16 @@ namespace YourNamespace
         {
             int productId = int.Parse(ddlProducts.SelectedValue);
             int qty = int.Parse(txtQty.Text);
+            var product = productData.GetById(productId);
 
-            // Aquí se debe agregar la lógica para agregar el producto al carrito
-            // y actualizar los labels de subtotal, IVA y total.
+            // Aquí se puede agregar la lógica para mostrar el carrito y calcular subtotal, IVA y total
+            // TODO: Implementar lógica para agregar al carrito y calcular totales
         }
 
         protected void btnCheckout_Click(object sender, EventArgs e)
         {
             // Aquí se debe implementar la lógica para registrar la venta
-            // usando el método CreateSale de SalesService.
+            // TODO: Implementar lógica para registrar la venta
         }
     }
 }
@@ -282,27 +282,28 @@ namespace YourNamespace
         {
             DateTime fromDate = DateTime.Parse(txtFrom.Text);
             DateTime toDate = DateTime.Parse(txtTo.Text);
-            gvSales.DataSource = salesData.GetByDateRange(fromDate, toDate);
+            var sales = salesData.GetByDateRange(fromDate, toDate);
+
+            gvSales.DataSource = sales;
             gvSales.DataBind();
 
             // Calcular total general
-            lblTotalGeneral.Text = "Total General: " + gvSales.Rows.Cast<GridViewRow>().Sum(row => decimal.Parse(row.Cells[4].Text)).ToString("C");
+            decimal totalGeneral = sales.Sum(s => s.Total);
+            lblTotalGeneral.Text = "Total General: " + totalGeneral.ToString("C");
         }
     }
 }
 ```
 
 ### Notas de Seguridad
-- Se utiliza **BCrypt** para el hash de contraseñas, asegurando que nunca se almacenen en texto plano.
-- Se implementa la validación de sesión en cada página para evitar accesos no autorizados.
-- Se utilizan consultas parametrizadas en ADO.NET para prevenir inyecciones SQL.
-- Se maneja la lógica de errores de forma que no se expongan detalles sensibles al usuario.
-
-Este código proporciona una base funcional para el sistema de punto de venta, y puedes expandirlo según sea necesario.
+- Se utiliza **parametrización** en todas las consultas SQL para prevenir inyecciones SQL.
+- Las contraseñas se almacenan como **hash** utilizando BCrypt, lo que proporciona un nivel de seguridad adecuado.
+- Se valida la entrada del usuario en el servidor y se utiliza `validateRequest="true"` en las páginas para prevenir ataques XSS.
+- Se gestiona la sesión del usuario sin utilizar cookies, asegurando que los datos de sesión se mantengan seguros.
 
 ✅ Guardado en: /home/runner/work/PuntoVentas/PuntoVentas/results/Codigo.md
 ✅ Guardado en: /home/runner/work/PuntoVentas/PuntoVentas/results/Codigo.md
-📏 Tamaño (bytes): 8660
+📏 Tamaño (bytes): 8631
 🧪 Existe?: True
 
 ✅ Guardado:
