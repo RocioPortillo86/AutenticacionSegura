@@ -1,0 +1,341 @@
+﻿/* =========================
+   Reset & base
+   ========================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #F5F6FA;
+    color: #111;
+    line-height: 1.45;
+}
+
+/* =========================
+   NAVBAR (menú)
+   ========================= */
+.main-nav {
+    background-color: #353A40; /* color principal */
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    height: 60px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+}
+
+    .main-nav .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: .2px;
+        color: #fff;
+    }
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+}
+
+    .nav-links li a {
+        text-decoration: none;
+        color: #fff;
+        font-weight: 500;
+        padding-bottom: 4px;
+        transition: color .25s ease, border-color .25s ease;
+        border-bottom: 2px solid transparent;
+    }
+
+        .nav-links li a:hover,
+        .nav-links li a.active {
+            color: #19A1B9;
+            border-bottom-color: #19A1B9;
+        }
+
+/* Responsive (menú se apila en pantallas estrechas) */
+@media (max-width: 768px) {
+    .main-nav {
+        padding: 0 1rem;
+        height: auto;
+        align-items: start;
+    }
+
+    .nav-links {
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: .75rem 0 1rem;
+    }
+}
+
+/* =========================
+   Layout general de páginas
+   ========================= */
+.page-wrap {
+    padding: 24px;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+    .page-header h1 {
+        font-size: 1.6rem;
+        color: #222;
+    }
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* =========================
+   Cards / contenedores
+   ========================= */
+.card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    padding: 16px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.card-title {
+    margin-bottom: 12px;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+/* =========================
+   GridView (tabla)
+   ========================= */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.table-head {
+    background: #353A40; /* mismo tono del menú */
+    color: #fff;
+    text-align: left;
+}
+
+.table th, .table td {
+    padding: 12px 14px;
+}
+
+.table-row {
+    background: #fff;
+    border-bottom: 1px solid #eee;
+}
+
+    .table-row.alt {
+        background: #fafafa;
+    }
+
+    .table-row:hover {
+        background: #f2f6ff;
+    }
+
+.row-selected {
+    background: #E8F0FE !important;
+}
+
+.table-pager {
+    padding: 10px;
+    text-align: right;
+}
+
+/* =========================
+   FormView / Formularios
+   ========================= */
+.form {
+    width: 100%;
+}
+
+/* --- Grid de 2 columnas con separación visible --- */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 columnas */
+    grid-column-gap: 20px; /* separación entre columnas */
+    grid-row-gap: 14px; /* separación entre filas */
+}
+
+    /* Fallback por si algún navegador ignora gap */
+    .form-grid > .form-field:nth-child(odd) {
+        margin-right: 10px;
+    }
+
+    .form-grid > .form-field:nth-child(even) {
+        margin-left: 10px;
+    }
+
+.form-field label {
+    display: block;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 6px;
+}
+
+.input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    background: #fff;
+    color: #222;
+    display: block;
+}
+
+    .input:focus {
+        outline: none;
+        border-color: #19A1B9;
+        box-shadow: 0 0 0 3px rgba(25,161,185,.15);
+    }
+
+.checkbox {
+    transform: scale(1.1);
+}
+
+/* Responsive: apilar en 1 columna en pantallas chicas */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+        grid-column-gap: 0;
+    }
+
+        .form-grid > .form-field:nth-child(odd),
+        .form-grid > .form-field:nth-child(even) {
+            margin: 0;
+        }
+}
+
+/* =========================
+   Mensajes / Alertas
+   ========================= */
+.alert {
+    display: none; /* cambia a block desde el code-behind cuando quieras mostrarlo */
+    margin: 10px 0 16px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #E8F4FD;
+    color: #0B66C3;
+}
+
+/* =========================
+   Botones
+   ========================= */
+.btn {
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 600;
+    transition: transform .05s ease, box-shadow .2s ease, background .2s ease;
+}
+
+    .btn:active {
+        transform: translateY(1px);
+    }
+
+.btn-primary {
+    background: #19A1B9;
+    color: #fff;
+}
+
+    .btn-primary:hover {
+        background: #158ca1;
+    }
+
+.btn-success {
+    background: #2CB57F;
+    color: #fff;
+}
+
+    .btn-success:hover {
+        background: #259a6c;
+    }
+
+.btn-danger {
+    background: #E13C4A;
+    color: #fff;
+}
+
+    .btn-danger:hover {
+        background: #c5333f;
+    }
+
+/* =========================
+   Extras heredados/compat
+   ========================= */
+.grid-header {
+    background-color: #19A1B9;
+    color: #fff;
+}
+/* si lo usas en otros grids */
+/* Totales en Caja */
+.totals {
+    display: flex;
+    gap: 24px;
+    justify-content: flex-end;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.total .label {
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 4px;
+    text-align: right;
+}
+
+.total .number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111;
+    min-width: 120px;
+    text-align: right;
+}
+
+/* ===== Login (auth) ===== */
+.auth-wrap {
+    min-height: calc(100vh - 60px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.auth-actions {
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
+}
+
+.field-error {
+    display: block;
+    margin-top: 6px;
+    color: #c62828;
+    font-size: .9rem;
+}
