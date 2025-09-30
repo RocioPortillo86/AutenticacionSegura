@@ -1,0 +1,63 @@
+{
+  "summary": "El análisis del código fuente del proyecto ASP.NET Web Forms con ADO.NET y SQL Server revela varias áreas críticas que requieren atención inmediata para mejorar la seguridad, calidad, rendimiento y mantenibilidad del sistema. Se identificaron riesgos significativos relacionados con la seguridad de las sesiones, el manejo de errores y la validación de entradas. Además, se observó un uso ineficiente de recursos en ciertas operaciones de base de datos que podrían afectar el rendimiento. La implementación de prácticas de codificación seguras y eficientes es esencial para mitigar estos riesgos y garantizar la robustez del sistema.",
+  "findings": [
+    {
+      "id": "R-001",
+      "category": "Seguridad",
+      "severity": "Alta",
+      "probability": "Alta",
+      "file": "Codigo/Site.Master.cs",
+      "line": 12,
+      "evidence": "Uso de sesiones sin validación de roles adecuada",
+      "impact": "Acceso no autorizado a funcionalidades",
+      "remediation": "Implementar validación de roles en el servidor",
+      "patch": "if (Session[\"uid\"] != null && Session[\"role\"] != null) { pnlAdmin.Visible = Session[\"role\"].ToString() == \"Admin\"; } else { pnlAdmin.Visible = false; }",
+      "references": []
+    },
+    {
+      "id": "R-002",
+      "category": "Rendimiento",
+      "severity": "Media",
+      "probability": "Media",
+      "file": "Codigo/Class/Services/SalesService.cs",
+      "line": 15,
+      "evidence": "Llamadas repetidas a ProductData.GetById dentro de un bucle",
+      "impact": "Degradación del rendimiento",
+      "remediation": "Almacenar los productos en una lista antes de calcular totales",
+      "patch": "var products = ProductData.GetByIds(items.Select(i => i.productId));",
+      "references": []
+    },
+    {
+      "id": "R-003",
+      "category": "Seguridad",
+      "severity": "Alta",
+      "probability": "Alta",
+      "file": "Codigo/Class/Services/AuthServices.cs",
+      "line": 12,
+      "evidence": "Falta de protección contra ataques de fuerza bruta en el inicio de sesión",
+      "impact": "Compromiso de cuentas de usuario",
+      "remediation": "Implementar bloqueo de cuenta tras múltiples intentos fallidos",
+      "patch": "// Implementar lógica de bloqueo de cuenta",
+      "references": []
+    },
+    {
+      "id": "R-004",
+      "category": "Seguridad",
+      "severity": "Alta",
+      "probability": "Alta",
+      "file": "Codigo/Class/Data/UserData.cs",
+      "line": 53,
+      "evidence": "Falta de validación de entrada en el método GetByEmail",
+      "impact": "Inyección SQL",
+      "remediation": "Validar y sanitizar entradas del usuario",
+      "patch": "if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException(\"Email no puede estar vacío.\");",
+      "references": []
+    }
+  ],
+  "metrics": {
+    "duplicatedCode": null,
+    "complexityHotspots": [],
+    "unsafeApis": [],
+    "unvalidatedInputs": []
+  }
+}
