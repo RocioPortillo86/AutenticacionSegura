@@ -1,16 +1,16 @@
-**Análisis de Ventas por Tipo de Producto**
+**Resumen de Análisis de Ventas por Tipo de Producto**
 
-Al analizar los datos de ventas proporcionados, se observa lo siguiente:
+Al analizar los datos de ventas por tipo de producto, se observa lo siguiente:
 
-- **Lácteos** es la categoría con el mayor número de ventas, alcanzando un total de 150 unidades. Esto sugiere una alta demanda de productos lácteos entre los consumidores.
+- **Lácteos** es la categoría con el mayor número de ventas, alcanzando un total de 150 unidades. Esto sugiere que los productos lácteos son los más demandados entre los consumidores.
 - **Frutas** es la categoría con el menor número de ventas, con solo 60 unidades vendidas. Esto podría indicar una menor preferencia o necesidad de estos productos en comparación con las otras categorías.
-- Las demás categorías se distribuyen de la siguiente manera: **Bebidas** con 120 unidades, **Panadería** con 90 unidades, y **Snacks** con 80 unidades.
+- Las otras categorías se distribuyen de la siguiente manera: **Bebidas** con 120 unidades, **Panadería** con 90 unidades, y **Snacks** con 80 unidades.
 
 **Conclusiones:**
 
-1. **Lácteos** lidera las ventas, lo que podría ser una oportunidad para expandir la oferta de productos en esta categoría o investigar más sobre las preferencias específicas dentro de los lácteos.
-2. **Frutas** tiene el menor rendimiento en ventas, lo que podría requerir estrategias de marketing o promociones para aumentar su atractivo.
-3. Las categorías de **Bebidas** y **Panadería** también muestran un buen desempeño, mientras que **Snacks** se encuentra en un nivel intermedio.
+1. Los productos lácteos son los más populares y podrían beneficiarse de un enfoque continuo en su promoción y disponibilidad.
+2. Las frutas, al tener las ventas más bajas, podrían requerir estrategias de marketing adicionales para aumentar su atractivo o disponibilidad.
+3. Las categorías de bebidas, panadería y snacks tienen ventas moderadas, lo que sugiere un interés constante pero no tan alto como los lácteos.
 
 **Gráfico de Barras:**
 
@@ -24,7 +24,7 @@ categorias = ['Bebidas', 'Snacks', 'Lácteos', 'Frutas', 'Panadería']
 ventas = [120, 80, 150, 60, 90]
 
 # Crear el gráfico de barras
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(8, 6))
 plt.bar(categorias, ventas, color=['blue', 'orange', 'green', 'red', 'purple'])
 plt.title('Ventas por Categoría de Producto')
 plt.xlabel('Categoría')
@@ -32,4 +32,4 @@ plt.ylabel('Cantidad Vendida')
 plt.show()
 ```
 
-Este gráfico de barras proporcionará una representación visual clara de las ventas por categoría, facilitando la identificación de tendencias y áreas de mejora.
+Este código generará un gráfico de barras que representa las ventas por categoría, facilitando la comparación visual de las mismas.

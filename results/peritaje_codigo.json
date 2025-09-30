@@ -1,5 +1,5 @@
 {
-  "summary": "El análisis del código fuente del proyecto ASP.NET Web Forms con ADO.NET y SQL Server revela varias áreas críticas que requieren atención inmediata para mejorar la seguridad, rendimiento, calidad y mantenibilidad del sistema. Se han identificado problemas de seguridad relacionados con la gestión de sesiones, el uso de parámetros SQL y la validación de entradas. Además, se observan oportunidades para optimizar el rendimiento mediante la reducción de llamadas repetitivas a la base de datos y mejorar la calidad del código al reducir la duplicación y la complejidad. La implementación de prácticas recomendadas de OWASP y la mejora en el manejo de errores y registros son esenciales para mitigar riesgos potenciales. Este informe detalla los riesgos identificados, su impacto y las recomendaciones para su remediación, priorizando acciones a corto, mediano y largo plazo.",
+  "summary": "El análisis del código del proyecto ASP.NET Web Forms revela varias áreas críticas que requieren atención para mejorar la seguridad, calidad, rendimiento y mantenibilidad. Se han identificado vulnerabilidades relacionadas con la seguridad de las sesiones, la validación de entradas y el manejo de transacciones. Además, se observan oportunidades para optimizar el rendimiento mediante la reducción de llamadas redundantes a la base de datos. La implementación de prácticas de codificación seguras, como el uso de parámetros SQL y la codificación de salidas, es esencial para mitigar riesgos de inyección SQL y XSS. Se recomienda priorizar las remediaciones de seguridad en los próximos 30 días, seguidas de mejoras de rendimiento y calidad en los siguientes 60 a 90 días.",
   "findings": [
     {
       "id": "R-001",
@@ -8,10 +8,10 @@
       "probability": "Alta",
       "file": "Codigo/Site.Master.cs",
       "line": 10,
-      "evidence": "Uso de `Session` sin validación de rol adecuada.",
-      "impact": "Acceso no autorizado a funcionalidades administrativas.",
-      "remediation": "Implementar validación de roles en el servidor.",
-      "patch": "if (Session[\"uid\"] != null && Session[\"role\"] != null && Session[\"role\"].ToString() == \"Admin\") { pnlAdmin.Visible = true; } else { pnlAdmin.Visible = false; }",
+      "evidence": "Uso de sesiones sin validación de roles activa",
+      "impact": "Acceso no autorizado a funciones administrativas",
+      "remediation": "Validar roles de usuario antes de mostrar contenido sensible",
+      "patch": "if (Session[\"uid\"] != null && Session[\"role\"].ToString() == \"Admin\") { pnlAdmin.Visible = true; } else { pnlAdmin.Visible = false; }",
       "references": []
     },
     {
@@ -20,10 +20,10 @@
       "severity": "Media",
       "probability": "Media",
       "file": "Codigo/Class/Services/SalesService.cs",
-      "line": 11,
-      "evidence": "Llamadas repetitivas a `ProductData.GetById` dentro de un bucle.",
-      "impact": "Degradación del rendimiento debido a múltiples accesos a la base de datos.",
-      "remediation": "Almacenar resultados en una variable temporal para evitar llamadas repetidas.",
+      "line": 12,
+      "evidence": "Llamadas repetidas a `ProductData.GetById` dentro de un bucle",
+      "impact": "Degradación del rendimiento en operaciones de venta",
+      "remediation": "Cachear resultados de `GetById` antes del bucle",
       "patch": "var products = items.Select(i => ProductData.GetById(i.productId)).ToDictionary(p => p.Id);",
       "references": []
     },
@@ -34,10 +34,10 @@
       "probability": "Alta",
       "file": "Codigo/Class/Services/AuthServices.cs",
       "line": 12,
-      "evidence": "Falta de validación de entrada para el campo `email`.",
-      "impact": "Posibilidad de inyección SQL o XSS.",
-      "remediation": "Validar y sanitizar entradas de usuario antes de procesarlas.",
-      "patch": "if (!IsValidEmail(email)) { throw new ArgumentException(\"Email inválido.\"); }",
+      "evidence": "Falta de protección contra CSRF en el proceso de autenticación",
+      "impact": "Posibilidad de ataques CSRF en el proceso de login",
+      "remediation": "Implementar tokens CSRF en formularios de autenticación",
+      "patch": "Implementar AntiForgeryToken en el formulario de login y verificar en el servidor",
       "references": []
     },
     {
@@ -45,12 +45,12 @@
       "category": "Seguridad",
       "severity": "Alta",
       "probability": "Alta",
-      "file": "Codigo/Class/Data/UserData.cs",
-      "line": 54,
-      "evidence": "Uso de `AddWithValue` sin especificar tipo de dato para `@Email`.",
-      "impact": "Riesgo de inyección SQL.",
-      "remediation": "Usar `SqlParameter` con tipo de dato explícito.",
-      "patch": "cmd.Parameters.Add(new SqlParameter(\"@Email\", SqlDbType.NVarChar, 255) { Value = email.Trim() });",
+      "file": "Codigo/Class/Data/SalesData.cs",
+      "line": 69,
+      "evidence": "Uso de `AddWithValue` sin especificar tipos de datos explícitos",
+      "impact": "Riesgo de inyección SQL debido a conversiones implícitas",
+      "remediation": "Usar `SqlParameter` con tipos de datos explícitos",
+      "patch": "cmd.Parameters.Add(\"@FromUtc\", SqlDbType.DateTime).Value = fromUtc;",
       "references": []
     }
   ],
