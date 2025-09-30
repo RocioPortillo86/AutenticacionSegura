@@ -5,15 +5,13 @@
 📏 Tamaño (bytes): 17603
 🧪 Existe?: True
 
-A continuación, se presenta el código en C# para los eventos de los botones en las páginas .aspx que has proporcionado. Este código incluye la lógica para guardar la información en la base de datos y mostrarla en los controles correspondientes.
+A continuación, se presenta el código en C# para los eventos de los botones en las páginas .aspx que has proporcionado. Este código incluye la lógica para guardar la información en la base de datos y mostrarla en las respectivas páginas.
 
 ### Login.aspx.cs
 ```csharp
 using System;
 using System.Web;
 using System.Web.UI;
-using YourNamespace.App_Code.Data;
-using YourNamespace.App_Code.Services;
 
 namespace YourNamespace
 {
@@ -38,6 +36,7 @@ namespace YourNamespace
 ### Default.aspx.cs
 ```csharp
 using System;
+using System.Web;
 using System.Web.UI;
 
 namespace YourNamespace
@@ -60,9 +59,9 @@ namespace YourNamespace
 ### Users.aspx.cs
 ```csharp
 using System;
+using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using YourNamespace.App_Code.Data;
 
 namespace YourNamespace
 {
@@ -85,47 +84,45 @@ namespace YourNamespace
 
         private void LoadUsers()
         {
-            gvUsers.DataSource = userData.GetAll();
+            var users = userData.GetAll();
+            gvUsers.DataSource = users;
             gvUsers.DataBind();
         }
 
         protected void btnNew_Click(object sender, EventArgs e)
         {
+            // Limpiar el formulario para nuevo usuario
             fvUser.ChangeMode(FormViewMode.Insert);
             fvUser.DataBind();
         }
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
+            // Guardar usuario
+            var user = new User
+            {
+                Email = ((TextBox)fvUser.FindControl("txtEmail")).Text,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(((TextBox)fvUser.FindControl("txtPassword")).Text),
+                Role = ((DropDownList)fvUser.FindControl("ddlRole")).SelectedValue,
+                Active = ((CheckBox)fvUser.FindControl("chkActive")).Checked
+            };
+
             if (fvUser.CurrentMode == FormViewMode.Insert)
             {
-                // TODO: Implement Insert logic
-                var user = new User
-                {
-                    Email = ((TextBox)fvUser.FindControl("txtEmail")).Text,
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(((TextBox)fvUser.FindControl("txtPassword")).Text),
-                    Role = ((DropDownList)fvUser.FindControl("ddlRole")).SelectedValue,
-                    Active = ((CheckBox)fvUser.FindControl("chkActive")).Checked
-                };
                 userData.Insert(user);
             }
             else if (fvUser.CurrentMode == FormViewMode.Edit)
             {
-                // TODO: Implement Update logic
-                var userId = (int)gvUsers.SelectedDataKey.Value;
-                var user = userData.GetById(userId);
-                user.Email = ((TextBox)fvUser.FindControl("txtEmail")).Text;
-                user.Role = ((DropDownList)fvUser.FindControl("ddlRole")).SelectedValue;
-                user.Active = ((CheckBox)fvUser.FindControl("chkActive")).Checked;
+                user.Id = Convert.ToInt32(gvUsers.SelectedDataKey.Value);
                 userData.Update(user);
             }
+
             LoadUsers();
         }
 
         protected void btnDelete_Command(object sender, CommandEventArgs e)
         {
-            // TODO: Implement Delete logic
-            var userId = (int)e.CommandArgument;
+            int userId = Convert.ToInt32(e.CommandArgument);
             userData.Delete(userId);
             LoadUsers();
         }
@@ -142,9 +139,9 @@ namespace YourNamespace
 ### Products.aspx.cs
 ```csharp
 using System;
+using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using YourNamespace.App_Code.Data;
 
 namespace YourNamespace
 {
@@ -167,29 +164,38 @@ namespace YourNamespace
 
         private void LoadProducts()
         {
-            gvProducts.DataSource = productData.GetAll();
+            var products = productData.GetAll();
+            gvProducts.DataSource = products;
             gvProducts.DataBind();
         }
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            // TODO: Implement Save logic
             var product = new Product
             {
                 Sku = ((TextBox)fvProduct.FindControl("txtSku")).Text,
                 Name = ((TextBox)fvProduct.FindControl("txtName")).Text,
-                Price = decimal.Parse(((TextBox)fvProduct.FindControl("txtPrice")).Text),
-                Stock = int.Parse(((TextBox)fvProduct.FindControl("txtStock")).Text),
+                Price = Convert.ToDecimal(((TextBox)fvProduct.FindControl("txtPrice")).Text),
+                Stock = Convert.ToInt32(((TextBox)fvProduct.FindControl("txtStock")).Text),
                 Active = ((CheckBox)fvProduct.FindControl("chkActive")).Checked
             };
-            productData.Insert(product);
+
+            if (fvProduct.CurrentMode == FormViewMode.Insert)
+            {
+                productData.Insert(product);
+            }
+            else if (fvProduct.CurrentMode == FormViewMode.Edit)
+            {
+                product.Id = Convert.ToInt32(gvProducts.SelectedDataKey.Value);
+                productData.Update(product);
+            }
+
             LoadProducts();
         }
 
         protected void btnDelete_Command(object sender, CommandEventArgs e)
         {
-            // TODO: Implement Delete logic
-            var productId = (int)e.CommandArgument;
+            int productId = Convert.ToInt32(e.CommandArgument);
             productData.Delete(productId);
             LoadProducts();
         }
@@ -209,9 +215,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI;
-using System.Web.UI.WebControls;
-using YourNamespace.App_Code.Data;
-using YourNamespace.App_Code.Services;
 
 namespace YourNamespace
 {
@@ -236,7 +239,8 @@ namespace YourNamespace
 
         private void LoadProducts()
         {
-            ddlProducts.DataSource = productData.GetAll();
+            var products = productData.GetAll();
+            ddlProducts.DataSource = products;
             ddlProducts.DataTextField = "Name";
             ddlProducts.DataValueField = "Id";
             ddlProducts.DataBind();
@@ -244,8 +248,8 @@ namespace YourNamespace
 
         protected void btnAddItem_Click(object sender, EventArgs e)
         {
-            var productId = int.Parse(ddlProducts.SelectedValue);
-            var qty = int.Parse(txtQty.Text);
+            int productId = Convert.ToInt32(ddlProducts.SelectedValue);
+            int qty = Convert.ToInt32(txtQty.Text);
             cart.Add((productId, qty));
             UpdateCart();
         }
@@ -261,19 +265,18 @@ namespace YourNamespace
             }).ToList();
             gvCart.DataBind();
 
-            var subtotal = cart.Sum(item => item.qty * productData.GetById(item.productId).Price);
-            lblSubtotal.Text = $"Subtotal: {subtotal:C}";
-            lblTax.Text = $"IVA: {subtotal * 0.16m:C}";
-            lblTotal.Text = $"Total: {subtotal * 1.16m:C}";
+            lblSubtotal.Text = "Subtotal: " + cart.Sum(item => item.qty * productData.GetById(item.productId).Price).ToString("C");
+            lblTax.Text = "IVA: " + (cart.Sum(item => item.qty * productData.GetById(item.productId).Price) * 0.16m).ToString("C");
+            lblTotal.Text = "Total: " + (cart.Sum(item => item.qty * productData.GetById(item.productId).Price) * 1.16m).ToString("C");
         }
 
         protected void btnCheckout_Click(object sender, EventArgs e)
         {
-            var cashierUserId = (int)Session["uid"];
+            int cashierUserId = (int)Session["uid"];
             salesService.CreateSale(cashierUserId, cart);
+            lblMessage.Text = "Venta registrada con éxito.";
             cart.Clear();
             UpdateCart();
-            lblMessage.Text = "Venta registrada con éxito.";
         }
     }
 }
@@ -283,7 +286,6 @@ namespace YourNamespace
 ```csharp
 using System;
 using System.Web.UI;
-using YourNamespace.App_Code.Data;
 
 namespace YourNamespace
 {
@@ -301,28 +303,27 @@ namespace YourNamespace
 
         protected void btnFilter_Click(object sender, EventArgs e)
         {
-            // TODO: Implement filtering logic
-            var fromDate = DateTime.Parse(txtFrom.Text);
-            var toDate = DateTime.Parse(txtTo.Text);
-            gvSales.DataSource = salesData.GetByDateRange(fromDate, toDate);
+            DateTime fromDate = DateTime.Parse(txtFrom.Text);
+            DateTime toDate = DateTime.Parse(txtTo.Text);
+            var sales = salesData.GetByDateRange(fromDate, toDate);
+            gvSales.DataSource = sales;
             gvSales.DataBind();
 
-            // TODO: Calculate total general
-            lblTotalGeneral.Text = $"Total General: {salesData.GetTotalSales(fromDate, toDate):C}";
+            lblTotalGeneral.Text = "Total General: " + sales.Sum(s => s.Total).ToString("C");
         }
     }
 }
 ```
 
 ### Notas sobre seguridad
-- Se utiliza **hash + salt** para las contraseñas mediante BCrypt, evitando el almacenamiento de texto plano.
-- Se implementan **consultas parametrizadas** en todas las interacciones con la base de datos para prevenir SQL Injection.
-- Se valida la sesión en cada página protegida, redirigiendo a la página de login si no está activa.
-- Se manejan excepciones adecuadamente, evitando la exposición de detalles sensibles al usuario.
+- Se utiliza **hash y salt** para las contraseñas mediante BCrypt, evitando el almacenamiento de contraseñas en texto plano.
+- Se implementan **consultas parametrizadas** en todas las interacciones con la base de datos para prevenir **SQL Injection**.
+- Se valida la sesión en cada página protegida, redirigiendo a la página de login si no hay sesión activa.
+- Se maneja la entrada del usuario y se asegura que los datos se procesen de manera segura y adecuada.
 
 ✅ Guardado en: /home/runner/work/PuntoVentas/PuntoVentas/results/Codigo.md
 ✅ Guardado en: /home/runner/work/PuntoVentas/PuntoVentas/results/Codigo.md
-📏 Tamaño (bytes): 9555
+📏 Tamaño (bytes): 9457
 🧪 Existe?: True
 
 ✅ Guardado:

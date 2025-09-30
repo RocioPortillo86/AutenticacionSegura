@@ -1,5 +1,5 @@
 {
-  "summary": "El análisis del código fuente del proyecto ASP.NET Web Forms con ADO.NET y SQL Server revela varias áreas críticas que requieren atención inmediata para mejorar la seguridad, calidad, rendimiento y mantenibilidad del sistema. Se identificaron riesgos significativos relacionados con la seguridad de las sesiones, el manejo de errores y la validación de entradas. Además, se observó un uso ineficiente de recursos en ciertas operaciones de base de datos que podrían afectar el rendimiento. La implementación de prácticas de codificación seguras y eficientes es esencial para mitigar estos riesgos y garantizar la robustez del sistema.",
+  "summary": "El análisis del código fuente del proyecto ASP.NET Web Forms con ADO.NET y SQL Server revela varias áreas críticas que requieren atención inmediata para mejorar la seguridad, rendimiento, calidad y mantenibilidad del sistema. Se han identificado problemas de seguridad relacionados con la gestión de sesiones, el uso de parámetros SQL y la validación de entradas. Además, se observan oportunidades para optimizar el rendimiento mediante la reducción de llamadas repetitivas a la base de datos y mejorar la calidad del código al reducir la duplicación y la complejidad. La implementación de prácticas recomendadas de OWASP y la mejora en el manejo de errores y registros son esenciales para mitigar riesgos potenciales. Este informe detalla los riesgos identificados, su impacto y las recomendaciones para su remediación, priorizando acciones a corto, mediano y largo plazo.",
   "findings": [
     {
       "id": "R-001",
@@ -7,11 +7,11 @@
       "severity": "Alta",
       "probability": "Alta",
       "file": "Codigo/Site.Master.cs",
-      "line": 12,
-      "evidence": "Uso de sesiones sin validación de roles adecuada",
-      "impact": "Acceso no autorizado a funcionalidades",
-      "remediation": "Implementar validación de roles en el servidor",
-      "patch": "if (Session[\"uid\"] != null && Session[\"role\"] != null) { pnlAdmin.Visible = Session[\"role\"].ToString() == \"Admin\"; } else { pnlAdmin.Visible = false; }",
+      "line": 10,
+      "evidence": "Uso de `Session` sin validación de rol adecuada.",
+      "impact": "Acceso no autorizado a funcionalidades administrativas.",
+      "remediation": "Implementar validación de roles en el servidor.",
+      "patch": "if (Session[\"uid\"] != null && Session[\"role\"] != null && Session[\"role\"].ToString() == \"Admin\") { pnlAdmin.Visible = true; } else { pnlAdmin.Visible = false; }",
       "references": []
     },
     {
@@ -20,11 +20,11 @@
       "severity": "Media",
       "probability": "Media",
       "file": "Codigo/Class/Services/SalesService.cs",
-      "line": 15,
-      "evidence": "Llamadas repetidas a ProductData.GetById dentro de un bucle",
-      "impact": "Degradación del rendimiento",
-      "remediation": "Almacenar los productos en una lista antes de calcular totales",
-      "patch": "var products = ProductData.GetByIds(items.Select(i => i.productId));",
+      "line": 11,
+      "evidence": "Llamadas repetitivas a `ProductData.GetById` dentro de un bucle.",
+      "impact": "Degradación del rendimiento debido a múltiples accesos a la base de datos.",
+      "remediation": "Almacenar resultados en una variable temporal para evitar llamadas repetidas.",
+      "patch": "var products = items.Select(i => ProductData.GetById(i.productId)).ToDictionary(p => p.Id);",
       "references": []
     },
     {
@@ -34,10 +34,10 @@
       "probability": "Alta",
       "file": "Codigo/Class/Services/AuthServices.cs",
       "line": 12,
-      "evidence": "Falta de protección contra ataques de fuerza bruta en el inicio de sesión",
-      "impact": "Compromiso de cuentas de usuario",
-      "remediation": "Implementar bloqueo de cuenta tras múltiples intentos fallidos",
-      "patch": "// Implementar lógica de bloqueo de cuenta",
+      "evidence": "Falta de validación de entrada para el campo `email`.",
+      "impact": "Posibilidad de inyección SQL o XSS.",
+      "remediation": "Validar y sanitizar entradas de usuario antes de procesarlas.",
+      "patch": "if (!IsValidEmail(email)) { throw new ArgumentException(\"Email inválido.\"); }",
       "references": []
     },
     {
@@ -46,11 +46,11 @@
       "severity": "Alta",
       "probability": "Alta",
       "file": "Codigo/Class/Data/UserData.cs",
-      "line": 53,
-      "evidence": "Falta de validación de entrada en el método GetByEmail",
-      "impact": "Inyección SQL",
-      "remediation": "Validar y sanitizar entradas del usuario",
-      "patch": "if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException(\"Email no puede estar vacío.\");",
+      "line": 54,
+      "evidence": "Uso de `AddWithValue` sin especificar tipo de dato para `@Email`.",
+      "impact": "Riesgo de inyección SQL.",
+      "remediation": "Usar `SqlParameter` con tipo de dato explícito.",
+      "patch": "cmd.Parameters.Add(new SqlParameter(\"@Email\", SqlDbType.NVarChar, 255) { Value = email.Trim() });",
       "references": []
     }
   ],
