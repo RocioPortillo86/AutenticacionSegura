@@ -5,15 +5,13 @@
 📏 Tamaño (bytes): 17603
 🧪 Existe?: True
 
-A continuación, se presenta el código en C# para los eventos de los botones en las páginas .aspx que has proporcionado. Este código incluye la lógica para guardar la información en la base de datos y mostrarla en las respectivas páginas.
+A continuación, se presenta el código en C# para los eventos de los botones en las páginas .aspx que has proporcionado. Este código incluye la lógica para guardar la información en la base de datos y mostrarla en los controles correspondientes.
 
 ### Login.aspx.cs
 ```csharp
 using System;
 using System.Web;
 using System.Web.UI;
-using YourNamespace.App_Code.Data;
-using YourNamespace.App_Code.Services;
 
 namespace YourNamespace
 {
@@ -38,6 +36,7 @@ namespace YourNamespace
 ### Default.aspx.cs
 ```csharp
 using System;
+using System.Web;
 using System.Web.UI;
 
 namespace YourNamespace
@@ -50,8 +49,11 @@ namespace YourNamespace
             {
                 Response.Redirect("Login.aspx");
             }
-            lblWelcome.Text = "Bienvenido, " + Session["uid"].ToString();
-            lblRole.Text = "Rol: " + Session["role"].ToString();
+            else
+            {
+                lblWelcome.Text = "Bienvenido, " + Session["uid"].ToString();
+                lblRole.Text = "Rol: " + Session["role"].ToString();
+            }
         }
     }
 }
@@ -60,9 +62,9 @@ namespace YourNamespace
 ### Users.aspx.cs
 ```csharp
 using System;
+using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using YourNamespace.App_Code.Data;
 
 namespace YourNamespace
 {
@@ -72,7 +74,7 @@ namespace YourNamespace
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["uid"] == null)
+            if (Session["uid"] == null || Session["role"].ToString() != "Admin")
             {
                 Response.Redirect("Login.aspx");
             }
@@ -85,7 +87,8 @@ namespace YourNamespace
 
         private void LoadUsers()
         {
-            gvUsers.DataSource = userData.GetAll();
+            var users = userData.GetAll();
+            gvUsers.DataSource = users;
             gvUsers.DataBind();
         }
 
@@ -128,12 +131,6 @@ namespace YourNamespace
             userData.Delete(userId);
             LoadUsers();
         }
-
-        protected void gvUsers_PageIndexChanging(object sender, GridViewPageEventArgs e)
-        {
-            gvUsers.PageIndex = e.NewPageIndex;
-            LoadUsers();
-        }
     }
 }
 ```
@@ -141,9 +138,9 @@ namespace YourNamespace
 ### Products.aspx.cs
 ```csharp
 using System;
+using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using YourNamespace.App_Code.Data;
 
 namespace YourNamespace
 {
@@ -153,7 +150,7 @@ namespace YourNamespace
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["uid"] == null)
+            if (Session["uid"] == null || Session["role"].ToString() != "Admin")
             {
                 Response.Redirect("Login.aspx");
             }
@@ -166,7 +163,8 @@ namespace YourNamespace
 
         private void LoadProducts()
         {
-            gvProducts.DataSource = productData.GetAll();
+            var products = productData.GetAll();
+            gvProducts.DataSource = products;
             gvProducts.DataBind();
         }
 
@@ -191,12 +189,6 @@ namespace YourNamespace
             productData.Delete(productId);
             LoadProducts();
         }
-
-        protected void gvProducts_PageIndexChanging(object sender, GridViewPageEventArgs e)
-        {
-            gvProducts.PageIndex = e.NewPageIndex;
-            LoadProducts();
-        }
     }
 }
 ```
@@ -207,8 +199,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI;
-using YourNamespace.App_Code.Data;
-using YourNamespace.App_Code.Services;
 
 namespace YourNamespace
 {
@@ -233,7 +223,8 @@ namespace YourNamespace
 
         private void LoadProducts()
         {
-            ddlProducts.DataSource = productData.GetAll();
+            var products = productData.GetAll();
+            ddlProducts.DataSource = products;
             ddlProducts.DataTextField = "Name";
             ddlProducts.DataValueField = "Id";
             ddlProducts.DataBind();
@@ -258,9 +249,10 @@ namespace YourNamespace
             }).ToList();
             gvCart.DataBind();
 
-            lblSubtotal.Text = "Subtotal: " + cart.Sum(item => item.qty * productData.GetById(item.productId).Price).ToString("C");
-            lblTax.Text = "IVA: " + (cart.Sum(item => item.qty * productData.GetById(item.productId).Price) * 0.16m).ToString("C");
-            lblTotal.Text = "Total: " + (cart.Sum(item => item.qty * productData.GetById(item.productId).Price) * 1.16m).ToString("C");
+            var subtotal = cart.Sum(item => item.qty * productData.GetById(item.productId).Price);
+            lblSubtotal.Text = $"Subtotal: {subtotal:C}";
+            lblTax.Text = $"IVA: {subtotal * 0.16m:C}";
+            lblTotal.Text = $"Total: {subtotal * 1.16m:C}";
         }
 
         protected void btnCheckout_Click(object sender, EventArgs e)
@@ -279,7 +271,6 @@ namespace YourNamespace
 ```csharp
 using System;
 using System.Web.UI;
-using YourNamespace.App_Code.Data;
 
 namespace YourNamespace
 {
@@ -299,26 +290,26 @@ namespace YourNamespace
         {
             DateTime fromDate = DateTime.Parse(txtFrom.Text);
             DateTime toDate = DateTime.Parse(txtTo.Text);
-            gvSales.DataSource = salesData.GetByDateRange(fromDate, toDate);
+            var sales = salesData.GetByDateRange(fromDate, toDate);
+            gvSales.DataSource = sales;
             gvSales.DataBind();
 
-            // Calcular total general
-            lblTotalGeneral.Text = "Total General: " + salesData.GetTotalSales(fromDate, toDate).ToString("C");
+            decimal totalGeneral = sales.Sum(sale => sale.Total);
+            lblTotalGeneral.Text = $"Total General: {totalGeneral:C}";
         }
     }
 }
 ```
 
-### Notas sobre seguridad
-- Se utiliza **hashing** de contraseñas con BCrypt para almacenar las contraseñas de forma segura.
-- Se implementa **validación de sesión** en cada página para asegurar que el usuario esté autenticado.
-- Se utilizan **consultas parametrizadas** en todas las interacciones con la base de datos para prevenir **SQL Injection**.
-- Se maneja la **excepción** en las transacciones para asegurar la integridad de los datos.
-- Se utiliza `Session` para mantener el estado del usuario sin depender de cookies.
+### Consideraciones de Seguridad
+- Se utiliza **parametrización** en todas las consultas SQL para prevenir inyecciones SQL.
+- Las contraseñas se almacenan como **hash** utilizando BCrypt, lo que proporciona un nivel de seguridad adecuado.
+- Se valida la entrada del usuario en el servidor y se utiliza `validateRequest="true"` en las páginas para prevenir ataques XSS.
+- Se gestiona la sesión de manera segura, evitando el uso de cookies y asegurando que solo los usuarios autenticados puedan acceder a las páginas protegidas.
 
 ✅ Guardado en: /home/runner/work/PuntoVentas/PuntoVentas/results/Codigo.md
 ✅ Guardado en: /home/runner/work/PuntoVentas/PuntoVentas/results/Codigo.md
-📏 Tamaño (bytes): 9553
+📏 Tamaño (bytes): 9145
 🧪 Existe?: True
 
 ✅ Guardado:
