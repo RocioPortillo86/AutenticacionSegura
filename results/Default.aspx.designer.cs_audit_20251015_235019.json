@@ -1,0 +1,4 @@
+{
+  "error": "Respuesta no es JSON válido",
+  "raw": "```json\n{\n  \"file\": \"Default.aspx.designer.cs\",\n  \"vulnerabilities\": [\n    {\n      \"title\": \"Potential Information Disclosure\",\n      \"severity\": \"MEDIUM\",\n      \"cwe_id\": \"CWE-200\",\n      \"description\": \"The labels (lblWelcome, lblRole, lblCountProducts, lblSalesToday, lblTotalToday) may display sensitive information without proper access control, potentially exposing user roles and sales data to unauthorized users.\",\n      \"line_numbers\": [12, 20, 28, 36, 44],\n      \"recommendation\": \"Implement proper access control checks to ensure that sensitive information is only displayed to authorized users. Consider using role-based access control (RBAC) to restrict visibility of these labels.\"\n    }\n  ]\n}\n```"
+}
