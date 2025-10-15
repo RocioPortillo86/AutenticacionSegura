@@ -1,1 +1,1 @@
-# Pruebas Automatizadas y Aseguramiento de la Calidad.
+# Pruebas Automatizadas y Aseguramiento de la Calidad
