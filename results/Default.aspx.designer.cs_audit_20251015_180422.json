@@ -1,0 +1,4 @@
+{
+  "error": "Respuesta no es JSON válido",
+  "raw": "```json\n{\n  \"file\": \"Default.aspx.designer.cs\",\n  \"vulnerabilities\": [\n    {\n      \"title\": \"Potential Information Disclosure\",\n      \"severity\": \"MEDIUM\",\n      \"cwe_id\": \"CWE-200\",\n      \"description\": \"The labels in the code (lblWelcome, lblRole, etc.) may display sensitive information such as user roles or counts of products and sales. If not properly secured, this information could be exposed to unauthorized users.\",\n      \"line_numbers\": [12, 18, 24, 30, 36],\n      \"recommendation\": \"Ensure that sensitive information is only displayed to authorized users. Implement proper access controls and validation to prevent unauthorized access to this data.\"\n    }\n  ]\n}\n```"
+}

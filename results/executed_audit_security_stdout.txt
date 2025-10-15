@@ -1,0 +1,34 @@
+🤖 Modelo listo
+Encontrados 13 archivos para auditar
+🔍 Auditando: codigos/Default.aspx.designer.cs
+✅ Auditoría guardada en results/Default.aspx.designer.cs_audit_20251015_180422.json
+🔍 Auditando: codigos/User.cs
+✅ Auditoría guardada en results/User.cs_audit_20251015_180428.json
+🔍 Auditando: codigos/JwtHelpers.cs
+✅ Auditoría guardada en results/JwtHelpers.cs_audit_20251015_180439.json
+🔍 Auditando: codigos/Default.aspx.cs
+✅ Auditoría guardada en results/Default.aspx.cs_audit_20251015_180448.json
+🔍 Auditando: codigos/Global.asax.cs
+✅ Auditoría guardada en results/Global.asax.cs_audit_20251015_180514.json
+🔍 Auditando: codigos/Login.aspx.designer.cs
+✅ Auditoría guardada en results/Login.aspx.designer.cs_audit_20251015_180521.json
+🔍 Auditando: codigos/Login.aspx.cs
+✅ Auditoría guardada en results/Login.aspx.cs_audit_20251015_180535.json
+🔍 Auditando: codigos/UserData.cs
+✅ Auditoría guardada en results/UserData.cs_audit_20251015_180543.json
+🔍 Auditando: codigos/AuthServices.cs
+✅ Auditoría guardada en results/AuthServices.cs_audit_20251015_180556.json
+🔍 Auditando: codigos/Default.aspx
+✅ Auditoría guardada en results/Default.aspx_audit_20251015_180603.json
+🔍 Auditando: codigos/Login.aspx
+✅ Auditoría guardada en results/Login.aspx_audit_20251015_180614.json
+🔍 Auditando: codigos/Global.asax
+✅ Auditoría guardada en results/Global.asax_audit_20251015_180615.json
+🔍 Auditando: codigos/Web.config
+✅ Auditoría guardada en results/Web.config_audit_20251015_180627.json
+📊 Resumen general:
+CRITICAL : 0
+HIGH     : 0
+MEDIUM   : 0
+LOW      : 0
+UNKNOWN  : 0
