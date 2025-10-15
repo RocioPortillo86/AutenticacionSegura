@@ -33,6 +33,8 @@ jobs:
           python -m pip install -U pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install jupyter nbconvert
+          # ➕ Necesario para la auditoría
+          pip install openai json5
 
       - name: Ensure OPENAI_API_KEY present
         run: |
@@ -47,6 +49,14 @@ jobs:
 
       - name: Ensure results folder
         run: mkdir -p results
+
+      # 🧠 Ejecutar auditoría de seguridad sobre /codigos y guardar JSON en /results
+      - name: Security audit (codigos → results)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # Asume que añadiste el script en la raíz del repo
+          python audit_security.py
 
       - name: Save text output to results/codigo_generado.cs
         run: |
