@@ -1,34 +1,35 @@
 🤖 Modelo listo
 Encontrados 13 archivos para auditar
 🔍 Auditando: codigos/Default.aspx.designer.cs
-✅ Auditoría guardada en results/Default.aspx.designer.cs_audit_20251015_180422.json
+✅ Auditoría guardada en results/Default.aspx.designer.cs_audit_20251015_232835.json
 🔍 Auditando: codigos/User.cs
-✅ Auditoría guardada en results/User.cs_audit_20251015_180428.json
+✅ Auditoría guardada en results/User.cs_audit_20251015_232839.json
 🔍 Auditando: codigos/JwtHelpers.cs
-✅ Auditoría guardada en results/JwtHelpers.cs_audit_20251015_180439.json
+✅ Auditoría guardada en results/JwtHelpers.cs_audit_20251015_232847.json
 🔍 Auditando: codigos/Default.aspx.cs
-✅ Auditoría guardada en results/Default.aspx.cs_audit_20251015_180448.json
+✅ Auditoría guardada en results/Default.aspx.cs_audit_20251015_232852.json
 🔍 Auditando: codigos/Global.asax.cs
-✅ Auditoría guardada en results/Global.asax.cs_audit_20251015_180514.json
+✅ Auditoría guardada en results/Global.asax.cs_audit_20251015_232858.json
 🔍 Auditando: codigos/Login.aspx.designer.cs
-✅ Auditoría guardada en results/Login.aspx.designer.cs_audit_20251015_180521.json
+✅ Auditoría guardada en results/Login.aspx.designer.cs_audit_20251015_232905.json
 🔍 Auditando: codigos/Login.aspx.cs
-✅ Auditoría guardada en results/Login.aspx.cs_audit_20251015_180535.json
+✅ Auditoría guardada en results/Login.aspx.cs_audit_20251015_232914.json
 🔍 Auditando: codigos/UserData.cs
-✅ Auditoría guardada en results/UserData.cs_audit_20251015_180543.json
+✅ Auditoría guardada en results/UserData.cs_audit_20251015_232922.json
 🔍 Auditando: codigos/AuthServices.cs
-✅ Auditoría guardada en results/AuthServices.cs_audit_20251015_180556.json
+✅ Auditoría guardada en results/AuthServices.cs_audit_20251015_232932.json
 🔍 Auditando: codigos/Default.aspx
-✅ Auditoría guardada en results/Default.aspx_audit_20251015_180603.json
+✅ Auditoría guardada en results/Default.aspx_audit_20251015_232936.json
 🔍 Auditando: codigos/Login.aspx
-✅ Auditoría guardada en results/Login.aspx_audit_20251015_180614.json
+✅ Auditoría guardada en results/Login.aspx_audit_20251015_232943.json
 🔍 Auditando: codigos/Global.asax
-✅ Auditoría guardada en results/Global.asax_audit_20251015_180615.json
+✅ Auditoría guardada en results/Global.asax_audit_20251015_232945.json
 🔍 Auditando: codigos/Web.config
-✅ Auditoría guardada en results/Web.config_audit_20251015_180627.json
+✅ Auditoría guardada en results/Web.config_audit_20251015_232955.json
 📊 Resumen general:
 CRITICAL : 0
 HIGH     : 0
 MEDIUM   : 0
 LOW      : 0
 UNKNOWN  : 0
+▶ Auditando: /home/runner/work/AutenticacionSegura/AutenticacionSegura/codigos -> /home/runner/work/AutenticacionSegura/AutenticacionSegura/results (codigos)

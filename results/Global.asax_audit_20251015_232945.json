@@ -1,0 +1,4 @@
+{
+  "error": "Respuesta no es JSON válido",
+  "raw": "```json\n{\n  \"file\": \"Global.asax\",\n  \"vulnerabilities\": []\n}\n```"
+}
