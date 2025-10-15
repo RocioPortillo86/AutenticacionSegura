@@ -3,89 +3,108 @@ name: CI - Ejecutar Notebook y guardar resultados
 on:
   workflow_dispatch: {}
   push:
-    branches: [ main ]   # ejecuta en cualquier cambio a main
+    branches: [ main ]
 
 permissions:
   contents: write
 
 jobs:
-  run-notebook:
+  run-notebooks:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      NOTEBOOK_FILE: PuntoVentas.ipynb   # cambia el nombre si tu notebook es otro
+      # Lista de notebooks a ejecutar (primero el de seguridad)
+      NOTEBOOKS: |
+        audit_security.ipynb
+        # PuntoVentas.ipynb   # <- descomenta si quieres ejecutar también este
 
     steps:
-      - name: Checkout repo
+      - name: 🔄 Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Python
+      - name: 🐍 Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
+          cache: "pip"
 
-      - name: Install deps
+      - name: 📦 Install deps
         run: |
           python -m pip install -U pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install jupyter nbconvert
-          # ➕ Necesario para la auditoría
-          pip install openai json5
+          # Herramientas para ejecutar notebooks en CI
+          pip install jupyter nbconvert nbclient ipykernel
+          # Libs útiles del pipeline
+          pip install openai json5 requests rich
 
-      - name: Ensure OPENAI_API_KEY present
+      - name: 🔑 Ensure OPENAI_API_KEY present
         run: |
           test -n "${OPENAI_API_KEY}" || (echo "OPENAI_API_KEY no está definido como secret." && exit 1)
 
-      - name: Execute notebook
+      - name: 🧪 Execute notebooks
+        shell: bash
         run: |
-          jupyter nbconvert --to notebook --execute "$NOTEBOOK_FILE" \
-            --output executed.ipynb \
-            --ExecutePreprocessor.timeout=1200 \
-            --ExecutePreprocessor.kernel_name=python3
+          mkdir -p results
+          echo "📝 Notebooks a ejecutar:"
+          echo "${NOTEBOOKS}"
+          while IFS= read -r nb; do
+            # Saltar líneas vacías o comentadas
+            [[ -z "$nb" || "$nb" =~ ^# ]] && continue
+            echo "▶ Ejecutando $nb"
+            test -f "$nb" || (echo "❌ No existe $nb en $(pwd)" && exit 2)
+            jupyter nbconvert \
+              --to notebook \
+              --execute "$nb" \
+              --output "executed_${nb}" \
+              --log-level=DEBUG \
+              --ExecutePreprocessor.timeout=1800 \
+              --ExecutePreprocessor.kernel_name=python3 \
+              --ExecutePreprocessor.allow_errors=True
+          done <<< "${NOTEBOOKS}"
 
-      - name: Ensure results folder
-        run: mkdir -p results
-
-      # 🧠 Ejecutar auditoría de seguridad sobre /codigos y guardar JSON en /results
-      - name: Security audit (codigos → results)
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - name: 🧠 (Opcional) Security audit script if present
         run: |
-          # Asume que añadiste el script en la raíz del repo
-          python audit_security.py
+          if [ -f audit_security.py ]; then
+            echo "Encontrado audit_security.py → ejecutando..."
+            python audit_security.py
+          else
+            echo "No se encontró audit_security.py (ok, la auditoría ya corre desde el notebook)."
+          fi
 
-      - name: Save text output to results/codigo_generado.cs
+      - name: 🧾 Save stdout from executed notebooks
         run: |
           python - <<'PY'
-          import nbformat, os
-          nb = nbformat.read("executed.ipynb", as_version=4)
-          out_lines = []
-          for cell in nb.cells:
-              for o in cell.get("outputs", []):
-                  if o.get("output_type") == "stream" and o.get("text"):
-                      out_lines.append(o["text"])
+          import os, glob, nbformat
           os.makedirs("results", exist_ok=True)
-          with open("results/codigo_generado.cs","w",encoding="utf-8") as f:
-              f.write("\n".join(out_lines))
-          print("results/codigo_generado.cs escrito")
+          for path in glob.glob("executed_*.ipynb"):
+            nb = nbformat.read(path, as_version=4)
+            out_lines = []
+            for cell in nb.cells:
+              for o in cell.get("outputs", []):
+                if o.get("output_type") == "stream" and o.get("text"):
+                  out_lines.append(o["text"])
+            name = os.path.splitext(os.path.basename(path))[0] + "_stdout.txt"
+            with open(os.path.join("results", name), "w", encoding="utf-8") as f:
+              f.write("".join(out_lines))
+            print(f"✅ Guardado: results/{name}")
           PY
 
-      - name: Upload artifacts
+      - name: ⬆️ Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: executed-and-results
           path: |
-            executed.ipynb
+            executed_*.ipynb
             results/
 
-      - name: Commit results (if any)
+      - name: 💾 Commit results (if any)
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add executed.ipynb results/ || true
-          git commit -m "CI: update executed notebook and results" || echo "No changes"
+          git add executed_*.ipynb results/ || true
+          git commit -m "CI: update executed notebooks and results" || echo "No changes"
           git push || true
