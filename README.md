@@ -32,4 +32,4 @@ Si el Quality Gate falla, el pipeline se detiene automáticamente para evitar la
 Carpeta	Descripción
 codigos/	Contiene el código fuente a analizar.
 results/	Almacena los reportes .json, el gráfico comparativo y los resultados del Quality Gate.
-.github/workflows/	Contiene el pipeline de GitHub Actions que ejecuta todo el proceso automáticamente.
+.github/workflows/	Contiene el pipeline de GitHub Actions que ejecuta todo el proceso automáticamente..
