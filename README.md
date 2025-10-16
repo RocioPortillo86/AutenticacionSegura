@@ -33,3 +33,7 @@ Carpeta	Descripción
 codigos/	Contiene el código fuente a analizar.
 results/	Almacena los reportes .json, el gráfico comparativo y los resultados del Quality Gate.
 .github/workflows/	Contiene el pipeline de GitHub Actions que ejecuta todo el proceso automáticamente..
+
+Link para descargar aplicativo:
+
+https://drive.google.com/file/d/1xrOv3ZwleIWr4Fka7431XMsktLXsP-c8/view?usp=drive_link
