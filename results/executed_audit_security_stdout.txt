@@ -1,35 +1,35 @@
 🤖 Modelo listo
 Encontrados 15 archivos para auditar
 🔍 Auditando: codigos/JwtHelpersTests.cs
-✅ Auditoría guardada en results/JwtHelpersTests.cs_audit_20251016_231102.json
+✅ Auditoría guardada en results/JwtHelpersTests.cs_audit_20251016_233218.json
 🔍 Auditando: codigos/User.cs
-✅ Auditoría guardada en results/User.cs_audit_20251016_231109.json
+✅ Auditoría guardada en results/User.cs_audit_20251016_233225.json
 🔍 Auditando: codigos/LoginPageTests.cs
-✅ Auditoría guardada en results/LoginPageTests.cs_audit_20251016_231118.json
+✅ Auditoría guardada en results/LoginPageTests.cs_audit_20251016_233236.json
 🔍 Auditando: codigos/AuthServicesTests.cs
-✅ Auditoría guardada en results/AuthServicesTests.cs_audit_20251016_231129.json
+✅ Auditoría guardada en results/AuthServicesTests.cs_audit_20251016_233244.json
 🔍 Auditando: codigos/Default.aspx.cs
-✅ Auditoría guardada en results/Default.aspx.cs_audit_20251016_231137.json
+✅ Auditoría guardada en results/Default.aspx.cs_audit_20251016_233253.json
 🔍 Auditando: codigos/Global.asax.cs
-✅ Auditoría guardada en results/Global.asax.cs_audit_20251016_231143.json
+✅ Auditoría guardada en results/Global.asax.cs_audit_20251016_233300.json
 🔍 Auditando: codigos/Login.aspx.designer.cs
-✅ Auditoría guardada en results/Login.aspx.designer.cs_audit_20251016_231146.json
+✅ Auditoría guardada en results/Login.aspx.designer.cs_audit_20251016_233307.json
 🔍 Auditando: codigos/DefaultPageTests.cs
-✅ Auditoría guardada en results/DefaultPageTests.cs_audit_20251016_231153.json
+✅ Auditoría guardada en results/DefaultPageTests.cs_audit_20251016_233313.json
 🔍 Auditando: codigos/Login.aspx.cs
-✅ Auditoría guardada en results/Login.aspx.cs_audit_20251016_231203.json
+✅ Auditoría guardada en results/Login.aspx.cs_audit_20251016_233322.json
 🔍 Auditando: codigos/UserTests.cs
-✅ Auditoría guardada en results/UserTests.cs_audit_20251016_231212.json
+✅ Auditoría guardada en results/UserTests.cs_audit_20251016_233328.json
 🔍 Auditando: codigos/UserData.cs
-✅ Auditoría guardada en results/UserData.cs_audit_20251016_231220.json
+✅ Auditoría guardada en results/UserData.cs_audit_20251016_233334.json
 🔍 Auditando: codigos/AuthServices.cs
-✅ Auditoría guardada en results/AuthServices.cs_audit_20251016_231229.json
+✅ Auditoría guardada en results/AuthServices.cs_audit_20251016_233343.json
 🔍 Auditando: codigos/Default.aspx
-✅ Auditoría guardada en results/Default.aspx_audit_20251016_231234.json
+✅ Auditoría guardada en results/Default.aspx_audit_20251016_233349.json
 🔍 Auditando: codigos/Login.aspx
-✅ Auditoría guardada en results/Login.aspx_audit_20251016_231245.json
+✅ Auditoría guardada en results/Login.aspx_audit_20251016_233400.json
 🔍 Auditando: codigos/Global.asax
-✅ Auditoría guardada en results/Global.asax_audit_20251016_231246.json
+✅ Auditoría guardada en results/Global.asax_audit_20251016_233401.json
 📊 Resumen general:
 CRITICAL : 0
 HIGH     : 0
@@ -39,8 +39,8 @@ UNKNOWN  : 0
 ▶ Auditando: /home/runner/work/AutenticacionSegura/AutenticacionSegura/codigos -> /home/runner/work/AutenticacionSegura/AutenticacionSegura/results (codigos)
 ⚠️ No se encontraron archivos de resultados (inseguro y seguro).
 🧩 Comparando:
- - Global.asax_audit_20251016_231246.json
- - Login.aspx_audit_20251016_231245.json
+ - Global.asax_audit_20251016_233401.json
+ - Login.aspx_audit_20251016_233400.json
 
 📊 Conclusión:
 No hubo diferencia en el número de vulnerabilidades.
@@ -48,4 +48,4 @@ No hubo diferencia en el número de vulnerabilidades.
 🚧 Validando Quality Gate...
 
 ✅ QUALITY GATE APROBADO
-📁 Reporte guardado en: results/quality_gate_20251016_231249.json
+📁 Reporte guardado en: results/quality_gate_20251016_233404.json
