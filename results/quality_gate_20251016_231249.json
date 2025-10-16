@@ -1,0 +1,587 @@
+{
+    "fecha": "2025-10-16 23:12:49",
+    "criterios": {
+        "High": 0,
+        "Medium": 3,
+        "Low": 10
+    },
+    "resultados": [
+        {
+            "archivo": "AuthServices.cs_audit_20251015_180556.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "AuthServices.cs_audit_20251015_232932.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "AuthServices.cs_audit_20251015_233800.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "AuthServices.cs_audit_20251015_235111.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "AuthServices.cs_audit_20251015_235835.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "AuthServices.cs_audit_20251016_000632.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "AuthServices.cs_audit_20251016_231229.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "AuthServicesTests.cs_audit_20251016_231129.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx.cs_audit_20251015_180448.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx.cs_audit_20251015_232852.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx.cs_audit_20251015_233730.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx.cs_audit_20251015_235039.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx.cs_audit_20251015_235804.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx.cs_audit_20251016_000601.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx.cs_audit_20251016_231137.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx.designer.cs_audit_20251015_180422.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx.designer.cs_audit_20251015_232835.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx.designer.cs_audit_20251015_233713.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx.designer.cs_audit_20251015_235019.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx.designer.cs_audit_20251015_235748.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx.designer.cs_audit_20251016_000545.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx_audit_20251015_180603.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx_audit_20251015_232936.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx_audit_20251015_233805.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx_audit_20251015_235115.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx_audit_20251015_235839.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx_audit_20251016_000635.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Default.aspx_audit_20251016_231234.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "DefaultPageTests.cs_audit_20251016_231153.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Global.asax.cs_audit_20251015_180514.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Global.asax.cs_audit_20251015_232858.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Global.asax.cs_audit_20251015_233734.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Global.asax.cs_audit_20251015_235046.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Global.asax.cs_audit_20251015_235810.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Global.asax.cs_audit_20251016_000606.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Global.asax.cs_audit_20251016_231143.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Global.asax_audit_20251015_180615.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Global.asax_audit_20251015_232945.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Global.asax_audit_20251015_233812.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Global.asax_audit_20251015_235123.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Global.asax_audit_20251015_235845.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Global.asax_audit_20251016_000646.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Global.asax_audit_20251016_231246.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "JwtHelpers.cs_audit_20251015_180439.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "JwtHelpers.cs_audit_20251015_232847.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "JwtHelpers.cs_audit_20251015_233725.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "JwtHelpers.cs_audit_20251015_235032.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "JwtHelpers.cs_audit_20251015_235800.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "JwtHelpers.cs_audit_20251016_000556.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "JwtHelpersTests.cs_audit_20251016_231102.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx.cs_audit_20251015_180535.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx.cs_audit_20251015_232914.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx.cs_audit_20251015_233746.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx.cs_audit_20251015_235056.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx.cs_audit_20251015_235820.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx.cs_audit_20251016_000618.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx.cs_audit_20251016_231203.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx.designer.cs_audit_20251015_180521.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx.designer.cs_audit_20251015_232905.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx.designer.cs_audit_20251015_233739.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx.designer.cs_audit_20251015_235049.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx.designer.cs_audit_20251015_235813.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx.designer.cs_audit_20251016_000611.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx.designer.cs_audit_20251016_231146.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx_audit_20251015_180614.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx_audit_20251015_232943.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx_audit_20251015_233811.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx_audit_20251015_235122.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx_audit_20251015_235844.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx_audit_20251016_000644.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Login.aspx_audit_20251016_231245.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "LoginPageTests.cs_audit_20251016_231118.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "User.cs_audit_20251015_180428.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "User.cs_audit_20251015_232839.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "User.cs_audit_20251015_233717.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "User.cs_audit_20251015_235023.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "User.cs_audit_20251015_235753.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "User.cs_audit_20251016_000549.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "User.cs_audit_20251016_231109.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "UserData.cs_audit_20251015_180543.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "UserData.cs_audit_20251015_232922.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "UserData.cs_audit_20251015_233752.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "UserData.cs_audit_20251015_235102.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "UserData.cs_audit_20251015_235827.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "UserData.cs_audit_20251016_000624.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "UserData.cs_audit_20251016_231220.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "UserTests.cs_audit_20251016_231212.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Web.config_audit_20251015_180627.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Web.config_audit_20251015_232955.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Web.config_audit_20251015_233817.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Web.config_audit_20251015_235130.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Web.config_audit_20251015_235851.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "Web.config_audit_20251016_000654.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "quality_gate_20251015_235854.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "quality_gate_20251016_000659.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        },
+        {
+            "archivo": "quality_gate_20251016_230845.json",
+            "altas": 0,
+            "medias": 0,
+            "bajas": 0
+        }
+    ],
+    "estado": "APROBADO"
+}
